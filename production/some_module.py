@@ -1,8 +1,12 @@
-def f():
-  '''
-  Helpful usage example:
-  >>> f()
-  42
-  '''
+import logging
+logger = logging.getLogger('some_module')
 
-  return 42
+
+def f():
+    '''
+    Helpful usage example:
+    >>> f()
+    42
+    '''
+    logger.info('f...')
+    return 42
