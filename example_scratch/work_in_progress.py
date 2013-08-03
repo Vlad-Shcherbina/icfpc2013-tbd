@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../production')
+sys.path.append('../production')  # to run outside of eclipse
 
 import logging
 logging.basicConfig(level=logging.WARNING, stream=sys.stdout)
