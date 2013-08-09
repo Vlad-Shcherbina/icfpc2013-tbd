@@ -90,7 +90,7 @@ class Problem(object):
 
     def request_eval(self, xs):
         from statistics import is_actual_problem
-        assert not is_actual_problem(self.id), 'we are not ready for real world yet'
+        #assert not is_actual_problem(self.id), 'we are not ready for real world yet'
         for x in xs:
             assert 0 <= x < 2**64
             assert x not in self.values, (x, 'already evaluated')
@@ -104,7 +104,7 @@ class Problem(object):
 
     def guess(self, program):
         from statistics import is_actual_problem
-        assert not is_actual_problem(self.id), 'we are not ready for real world yet'
+        #assert not is_actual_problem(self.id), 'we are not ready for real world yet'
         r = send('guess', dict(id=self.id, program=program))
         if r['status'] == 'win':
             return True
