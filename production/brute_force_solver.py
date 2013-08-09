@@ -4,6 +4,7 @@ logger = logging.getLogger('brute')
 import sys
 import time
 from random import randrange
+import itertools
 
 from terms import *
 from communicate import Problem, get_training_problem
@@ -43,7 +44,13 @@ class Solver(object):
     def solve(cls, problem):
         assert cls.is_applicable(problem)
 
+        def candidate_matches(candidate):
+            return all(
+                evaluate(candidate, dict(x=x)) == y
+                for x, y in problem.values.items())
+
         candidates = enumerate_terms(problem.size-1, problem.operators)
+        candidates = itertools.ifilter(candidate_matches, candidates)
 
         start = time.clock()
         while True:
@@ -63,23 +70,12 @@ class Solver(object):
             problem.request_eval(xs)
             logger.info('{} data points'.format(len(problem.values)))
 
-            new_candidates = []
-            for t in candidates:
-                for x, y in problem.values.items():
-                    if evaluate(t, dict(x=x)) != y:
-                        break
-                else:
-                    new_candidates.append(t)
-
-            candidates = new_candidates
-            logger.info(
-                '{} candidates (possibly equivalent)'.format(len(candidates)))
-
-            assert len(candidates) > 0
+            candidate = next(candidates, None)
+            assert candidate is not None
 
             logger.info(
                 'time since start: {:.1f}s'.format(time.clock() - start))
-            program = (LAMBDA, ('x',), candidates[0])
+            program = (LAMBDA, ('x',), candidate)
             if problem.guess(term_to_str(program)):
                 logger.info('solved!')
                 break
