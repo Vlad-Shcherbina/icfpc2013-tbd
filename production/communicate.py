@@ -47,6 +47,7 @@ class Problem(object):
         'operators', # will be automatically converted to frozenset
         'solution',
         'values',
+        'solved',
     ]
 
     def __init__(self, id, size, operators):
@@ -55,16 +56,20 @@ class Problem(object):
         self.operators = frozenset(operators)
         self.solution = None
         self.values = {}
+        self.solved = None
 
     @staticmethod
     def from_json(js):
-        return Problem(
+        result = Problem(
                 str(js['id']),
                 int(js['size']),
                 map(str, js['operators']),
                 )
+        if 'solved' in js:
+            result.solved = js['solved']
+        return result
 
-    def __str__(self):
+    def __repr__(self):
         attrs = ((s, getattr(self, s, None))
                 for s in self.__slots__)
         return 'Problem({})'.format(', '.join(
@@ -118,6 +123,9 @@ def get_training_problem(size=None, operators=None):
 
     return p
 
+def get_real_problems():
+    r = send('myproblems', {})
+    return map(Problem.from_json, r)
 
 
 if __name__ == '__main__':
