@@ -108,7 +108,7 @@ class Problem(object):
 
 def get_training_problem(size=None, operators=None):
     assert size is None or 3 <= size <= 20
-    assert operators in [None, 'tfold', 'fold']
+    assert operators in [None, [], ['tfold'], ['fold']]
 
     data = {}
     if size is not None:
