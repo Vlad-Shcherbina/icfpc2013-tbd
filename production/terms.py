@@ -1,3 +1,4 @@
+import re
 
 LAMBDA = 'lambda'
 IF0 = 'if0'

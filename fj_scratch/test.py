@@ -25,12 +25,13 @@ def main():
 #    p.request_eval([1, 13, 2**64-1])
 #    print p.values    
         
-from terms import *
+from terms import parse_term
 
 
     
 
 if __name__ == '__main__':
     log.info('Yo!')
-    pprint(parse_term('(lambda (x_3199) (xor x_3199 (shl1 x_3199)))'))
-    log.info('done')
+#    p = get_training_problem(30, ['tfold'])
+#    pprint(parse_term(p.solution))
+#    log.info('done')
