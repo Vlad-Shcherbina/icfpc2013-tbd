@@ -63,7 +63,7 @@ class Problem(object):
                 int(js['size']),
                 map(str, js['operators']),
                 )
-                
+
     def __str__(self):
         attrs = ((s, getattr(self, s, None))
                 for s in self.__slots__)
@@ -126,7 +126,7 @@ if __name__ == '__main__':
 
     p = Problem(
         id='X7yhOXLMakIJ1exPmd85dIwv',
-        size=6, 
+        size=6,
         operators=['plus', 'shr1'])
     p.solution = '(lambda (x_5126) (shr1 (plus 1 (shr1 x_5126))))'
     print p
