@@ -88,10 +88,35 @@ def subst(t, replacements={}):
 
 def term_size(t):
     if isinstance(t, tuple):
-        if t[0] == 'lambda':
+        if t[0] == LAMBDA:
             assert len(t) == 3
             return 1 + term_size(t[2])
         else:
             # fold is covered by this case
             return sum(map(term_size, t))
     return 1
+
+
+def term_op(t):
+    '''
+    Implementation of function Op from problem statement.
+    '''
+    if isinstance(t, tuple):
+        if t[0] == LAMBDA:
+            assert len(t) == 3
+            return term_op(t[2])
+        else:
+            result = set([t[0]])
+            for tt in t[1:]:
+                result |= term_op(tt)
+            return result
+    return set()
+
+
+def term_operators(t):
+    '''
+    Implementation of Operators relation from problem statement as function.
+    '''
+    if isinstance(t, tuple) and t[0] == FOLD:
+        return term_op(t) | set(['tfold'])
+    return term_op(t)
