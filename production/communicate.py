@@ -29,6 +29,16 @@ def get_status():
     return send('status', {})
 
 
+def eval_program(program, xs):
+    data = dict(program=program, arguments=['0x{:x}'.format(x) for x in xs])
+    r = send('eval', data)
+    assert len(r['outputs']) == len(xs)
+    result = {}
+    for x, y in zip(xs, r['outputs']):
+        result[x] = int(y, 16)
+    return result
+
+
 class Problem(object):
     __slots__ = [
         'id',
@@ -125,3 +135,5 @@ if __name__ == '__main__':
     # If you guess right, problem will be removed and unavailable for guessing
     # anymore.
     #print p.guess('(lambda (x) x)')
+
+    #print eval_program('(lambda (x) (plus x 1))', [1, 20])
