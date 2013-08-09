@@ -27,9 +27,13 @@ def random_interesting_number():
 
 
 class Solver(object):
-    @staticmethod
-    def is_applicable(problem):
-        if problem.size > 8:
+    @classmethod
+    def supported_sizes(cls):
+        return range(3, 8+1)
+
+    @classmethod
+    def is_applicable(cls, problem):
+        if problem.size not in cls.supported_sizes():
             return False
         if 'if0' in problem.operators:
             return False
@@ -39,8 +43,10 @@ class Solver(object):
             return False
         return True
 
-    @staticmethod
-    def solve(problem):
+    @classmethod
+    def solve(cls, problem):
+        assert cls.is_applicable(problem)
+
         candidates = simple_terms(
             problem.size-1, CONSTANTS + ['x'], UNARY_OPS, BINARY_OPS)
 
@@ -60,7 +66,7 @@ class Solver(object):
                         break
 
             problem.request_eval(xs)
-            logging.info('{} data points'.format(len(problem.values)))
+            logger.info('{} data points'.format(len(problem.values)))
 
             new_candidates = []
             for t in candidates:
@@ -71,33 +77,17 @@ class Solver(object):
                     new_candidates.append(t)
 
             candidates = new_candidates
-            logging.info(
-                '{} candidates(possibly eqivalent)'.format(len(candidates)))
+            logger.info(
+                '{} candidates (possibly eqivalent)'.format(len(candidates)))
 
             assert len(candidates) > 0
 
-            logging.info(
+            logger.info(
                 'time since start: {:.1f}s'.format(time.clock() - start))
             program = (LAMBDA, ('x',), candidates[0])
             if problem.guess(term_to_str(program)):
-                logging.info('solved!')
+                logger.info('solved!')
                 break
 
-            logging.info('wrong guess')
+            logger.warning('wrong guess')
 
-
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-
-    while True:
-        logging.info('----------- trying another problem ------------')
-        p = get_training_problem(size=8)
-
-        logging.info(str(p))
-
-        if Solver.is_applicable(p):
-            Solver.solve(p)
-        else:
-            logging.info('dunno how to solve')
-
-        time.sleep(5)
