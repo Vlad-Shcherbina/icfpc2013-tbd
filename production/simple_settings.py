@@ -76,6 +76,10 @@ class Settings(object):
     def __setitem__(self, name, value): return self.set_value(name, value)
     def __delitem__(self, name): return self.delete_value(name)
 
+    def prompt_cli(self, name):
+        print 'Enter value for \'%s\':' % name,
+        return raw_input().strip()
+    
     def prompt_gui(self, name, propagate_exception = False):
         ''' Returns None if failed to load tkinter or open display.
         (unless propagate_exception == True).'''
@@ -120,7 +124,9 @@ class Settings(object):
         return result[0]
     
     def prompt(self, name):
-        return self.prompt_gui(name, True)
+        res = self.prompt_gui(name)
+        if res is not None: return res
+        return self.prompt_cli(name)
 
     def iter_all_db_values(self):
         '''Iterate over all values in the database (not only for current application)'''

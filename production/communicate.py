@@ -4,9 +4,8 @@ logger = logging.getLogger('communicate')
 import urllib2
 import json
 import time
-
+from pprint import pprint
 from simple_settings import settings
-
 
 BASE_URL = 'http://icfpc2013.cloudapp.net/'
 
@@ -16,7 +15,7 @@ class SendError(Exception):
 
 
 # only used internally
-def send(url, data):
+def send(url, data = {}):
     data = json.dumps(data)
     while True:
         logger.debug('sending {} to {}'.format(data, url))
@@ -40,7 +39,7 @@ def send(url, data):
 
 
 def get_status():
-    return send('status', {})
+    return send('status')
 
 
 def eval_program(program, xs):
@@ -138,14 +137,14 @@ def get_training_problem(size=None, operators=None):
     return p
 
 def get_real_problems():
-    r = send('myproblems', {})
+    r = send('myproblems')
     return map(Problem.from_json, r)
 
 
 if __name__ == '__main__':
     #logging.basicConfig(level=logging.DEBUG)
 
-    print get_status()
+    pprint(get_status())
     #print get_training_problem(size=6)
 
     # p = Problem(
