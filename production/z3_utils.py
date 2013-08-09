@@ -89,3 +89,35 @@ if __name__ == '__main__':
     t = (FOLD, 'x', 0, (LAMBDA, ('y', 'z'), (OR, 'y', 'z')))
     r = z3_eval_term(t, dict(x=2**64-1))
     print r
+
+    #################
+
+    solution = (PLUS, 'x', 1)
+    candidate1 = (PLUS, 1, 'x')
+    candidate2 = (OR, 'x', 1)
+
+    x = z3.BitVec('x', 64)
+
+    for candidate in candidate1, candidate2:
+        print
+        print 'checking', candidate
+        candidate_term = term_to_z3(candidate, dict(x=x))
+        solution_term = term_to_z3(solution, dict(x=x))
+
+        z3_solver.push()
+        z3_solver.add(candidate_term != solution_term)
+
+        result = z3_solver.check()
+        if result == z3.unsat:
+            print 'candidate is equivalent to solution'
+        elif result == z3.sat:
+            print z3_solver.model()
+            x = z3_solver.model()[x]
+            if x is None:
+                x = 0
+            else:
+                x = int(x.as_string())
+            print 'counterexample:', x
+
+
+        z3_solver.pop()
