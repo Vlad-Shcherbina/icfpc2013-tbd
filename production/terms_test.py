@@ -13,6 +13,9 @@ def test_to_str():
 def test_eval():
     eq_(evaluate((PLUS, 'x', 1), dict(x=42)), 43)
 
+    eq_(evaluate((IF0, 0, 1, 0)), 1)
+    eq_(evaluate((IF0, 1, 1, 0)), 0)
+
     eq_(apply(
             (LAMBDA, ('x',),
                 (FOLD, 'x', 0, (LAMBDA, ('y', 'z'), (OR, 'y', 'z')))),

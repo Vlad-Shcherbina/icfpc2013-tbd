@@ -34,6 +34,8 @@ if __name__ == '__main__':
         interesting_terms.append((op, 'x', hz))
         interesting_terms.append((op, hz, 'x'))
 
+    interesting_terms.append((IF0, 'x', 1, 0))
+
     fold_op = (LAMBDA, ('y', 'z'), (XOR, (SHL1, 'y'), 'z'))
     interesting_terms.append((FOLD, 'x', hz, fold_op))
 

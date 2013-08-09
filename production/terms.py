@@ -66,7 +66,12 @@ def evaluate(t, context={}):
         elif op == PLUS:
             assert len(t) == 3
             return (evaluate(t[1], context) + evaluate(t[2], context)) & MASK
-        # TODO: if0
+        if op == IF0:
+            _, cond, then, else_ = t
+            if evaluate(cond, context) == 0:
+                return evaluate(then, context)
+            else:
+                return evaluate(else_, context)
         elif op == FOLD:
             _, bytes, start, fn = t
             bytes = evaluate(bytes, context)
