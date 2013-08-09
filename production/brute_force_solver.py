@@ -29,7 +29,7 @@ def random_interesting_number():
 class Solver(object):
     @classmethod
     def supported_sizes(cls):
-        return range(8, 10+1)
+        return range(11, 11+1)
 
     @classmethod
     def is_applicable(cls, problem):
