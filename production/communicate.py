@@ -116,22 +116,24 @@ def get_training_problem(size=None, operators=None):
     from statistics import is_actual_problem
     assert not is_actual_problem(p.id)
 
+    return p
+
 
 
 if __name__ == '__main__':
     #logging.basicConfig(level=logging.DEBUG)
 
-    #print get_status()
+    print get_status()
     #print get_training_problem(size=6)
 
-    p = Problem(
-        id='X7yhOXLMakIJ1exPmd85dIwv',
-        size=6,
-        operators=['plus', 'shr1'])
-    p.solution = '(lambda (x_5126) (shr1 (plus 1 (shr1 x_5126))))'
-    print p
-    p.request_eval([1, 13, 2**64-1])
-    print p.values
+    # p = Problem(
+    #     id='X7yhOXLMakIJ1exPmd85dIwv',
+    #     size=6,
+    #     operators=['plus', 'shr1'])
+    # p.solution = '(lambda (x_5126) (shr1 (plus 1 (shr1 x_5126))))'
+    # print p
+    # p.request_eval([1, 13, 2**64-1])
+    # print p.values
 
     # If you guess right, problem will be removed and unavailable for guessing
     # anymore.
