@@ -71,18 +71,22 @@ def z3_eval_term(t, context={}):
     t = term_to_z3(t, context)
     result = z3.BitVec('result', 64)
 
-    z3_solver.push()
-    z3_solver.add(result == t)
-    assert z3_solver.check() == z3.sat
-    result = z3_solver.model()[result]
-    assert result is not None
-    result = int(result.as_string())
-    z3_solver.pop()
-
-    return result
+    with PushPop():
+        z3_solver.add(result == t)
+        assert z3_solver.check() == z3.sat
+        result = z3_solver.model()[result]
+        assert result is not None
+        return int(result.as_string())
 
 
 z3_solver = z3.Solver()
+
+
+class PushPop(object):
+    def __enter__(self):
+        z3_solver.push()
+    def __exit__(self, *args):
+        z3_solver.pop()
 
 
 if __name__ == '__main__':
@@ -104,20 +108,18 @@ if __name__ == '__main__':
         candidate_term = term_to_z3(candidate, dict(x=x))
         solution_term = term_to_z3(solution, dict(x=x))
 
-        z3_solver.push()
-        z3_solver.add(candidate_term != solution_term)
+        with PushPop():
+            z3_solver.add(candidate_term != solution_term)
 
-        result = z3_solver.check()
-        if result == z3.unsat:
-            print 'candidate is equivalent to solution'
-        elif result == z3.sat:
-            print z3_solver.model()
-            x = z3_solver.model()[x]
-            if x is None:
-                x = 0
+            result = z3_solver.check()
+            if result == z3.unsat:
+                print 'candidate is equivalent to solution'
+            elif result == z3.sat:
+                x = z3_solver.model()[x]
+                if x is None:
+                    x = 0
+                else:
+                    x = int(x.as_string())
+                print 'counterexample:', x
             else:
-                x = int(x.as_string())
-            print 'counterexample:', x
-
-
-        z3_solver.pop()
+                assert False, result
