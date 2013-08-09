@@ -36,6 +36,7 @@ def is_actual_problem(problem_id):
         
     return problem_id in _cached_problem_ids
         
+
 def load_problems():
     with open(MYPROBLEMS_FILE) as f:
         problems = json.load(f)
@@ -43,30 +44,30 @@ def load_problems():
     return problems
 
 
+def print_count_of_problems(name, problems, predicate):
+    print name
+    counter = Counter()
+    for p in problems:
+        if predicate(p):
+            counter[p.size] += 1
+    pprint(sorted(counter.iteritems()))
+    print
+
+
 def print_problem_statistics():
     problems = load_problems()
 
-    total = 0
-    simple, tfold, fold = Counter(), Counter(), Counter()
-    for p in problems:
-        total += 1
-        if 'fold' in p.operators:
-            d = fold
-        elif 'tfold' in p.operators:
-            assert 'fold' not in p.operators
-            d = tfold
-        else:
-            d = simple
-        d[p.size] += 1
-    assert total == sum(fold.itervalues()) + sum(tfold.itervalues()) + sum(simple.itervalues())
-    print 'Total =', total
-    def print_sizes(name, sizes):
-        print name
-        pprint(sorted(sizes.iteritems()))
-        print
-    print_sizes('simple', simple)
-    print_sizes('tfold', tfold)
-    print_sizes('fold', fold)
+    assert not any('fold' in p.operators and 'tfold' in p.operators for p in problems)
+    print 'Total =', len(problems)
+    print_count_of_problems('has fold', problems, lambda p: 'fold' in p.operators) 
+    print_count_of_problems('has tfold', problems, lambda p: 'tfold' in p.operators) 
+    print_count_of_problems('no folds', problems, 
+        lambda p: not ('fold' in p.operators or 'tfold' in p.operators))
+    print_count_of_problems('no if0', problems, 
+        lambda p: not ('if0' in p.operators))
+    print_count_of_problems('no if0 or folds', problems, 
+        lambda p: not ('if0' in p.operators or 'fold' in p.operators or 'tfold' in p.operators))
+     
 
 if __name__ == '__main__':
     print_problem_statistics()
