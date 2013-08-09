@@ -20,7 +20,7 @@ def train(solver):
     while True:
         logger.info('----------- trying another problem ------------')
         size = random.choice(solver.supported_sizes())
-        p = get_training_problem(size=size)
+        p = get_training_problem(size=size) #, operators=['tfold'])
 
         logger.info(str(p))
 

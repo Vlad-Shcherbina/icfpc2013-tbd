@@ -7,7 +7,7 @@ from random import randrange
 
 from terms import *
 from communicate import Problem, get_training_problem
-from enum_terms import simple_terms
+from enum_terms import simple_terms, tfold_terms
 
 
 NUMBERS_TO_TEST = [0] + [1 << i for i in [1, 2, 3, 4, 5, 15, 16, 31, 32, 63]]
@@ -29,7 +29,7 @@ def random_interesting_number():
 class Solver(object):
     @classmethod
     def supported_sizes(cls):
-        return range(3, 8+1)
+        return range(8, 10+1)
 
     @classmethod
     def is_applicable(cls, problem):
@@ -37,9 +37,7 @@ class Solver(object):
             return False
         if 'if0' in problem.operators:
             return False
-        if 'fold' in problem.operators:
-            return False
-        if 'tfold' in problem.operators:
+        if 'tfold' not in problem.operators and 'fold' in problem.operators:
             return False
         return True
 
@@ -47,8 +45,15 @@ class Solver(object):
     def solve(cls, problem):
         assert cls.is_applicable(problem)
 
-        candidates = simple_terms(
-            problem.size-1, CONSTANTS + ['x'], UNARY_OPS, BINARY_OPS)
+        unaries = [op for op in UNARY_OPS if op in problem.operators]
+        binaries = [op for op in BINARY_OPS if op in problem.operators]
+
+        if 'tfold' in problem.operators:
+            candidates = tfold_terms(
+                problem.size-1, CONSTANTS + ['x'], unaries, binaries)
+        else:
+            candidates = simple_terms(
+                problem.size-1, CONSTANTS + ['x'], unaries, binaries)
 
         start = time.clock()
         while True:
@@ -90,4 +95,3 @@ class Solver(object):
                 break
 
             logger.warning('wrong guess')
-
