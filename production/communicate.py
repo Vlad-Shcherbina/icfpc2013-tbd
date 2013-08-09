@@ -1,8 +1,12 @@
 import logging
 logger = logging.getLogger('communicate')
-from simple_settings import settings
+
 import urllib2
 import json
+import time
+
+from simple_settings import settings
+
 
 BASE_URL = 'http://icfpc2013.cloudapp.net/'
 
@@ -14,15 +18,25 @@ class SendError(Exception):
 # only used internally
 def send(url, data):
     data = json.dumps(data)
-    logger.debug('sending {} to {}'.format(data, url))
-    response = urllib2.urlopen(
-        BASE_URL + url + '?auth=' + settings['auth_token'] + 'vpsH1H', data=data)
-    response_text = response.read()
-    logger.debug(
-        'code: {}; response text: {}'.format(response.code, response_text))
-    if response.code == 200:
-        return json.loads(response_text)
-    raise SendError(response.code, response_text)
+    while True:
+        logger.debug('sending {} to {}'.format(data, url))
+        try:
+            response = urllib2.urlopen(
+                BASE_URL + url + '?auth=' + settings['auth_token'] + 'vpsH1H',
+                data=data)
+        except urllib2.HTTPError as e:
+            if e.code == 429:
+                logger.warning('429: {}'.format(e.reason))
+                time.sleep(10)
+                continue
+            raise
+        response_text = response.read()
+        logger.debug(
+            'code: {}; response text: {}'.format(response.code, response_text))
+        if response.code == 200:
+            return json.loads(response_text)
+
+        raise SendError(response.code, response_text)
 
 
 def get_status():
