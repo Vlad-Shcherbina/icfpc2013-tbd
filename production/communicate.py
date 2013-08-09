@@ -30,6 +30,7 @@ def get_status():
 
 
 def eval_program(program, xs):
+    assert program.startswith('(lambda')
     data = dict(program=program, arguments=['0x{:x}'.format(x) for x in xs])
     r = send('eval', data)
     assert len(r['outputs']) == len(xs)
