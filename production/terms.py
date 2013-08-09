@@ -66,7 +66,15 @@ def evaluate(t, context={}):
         elif op == PLUS:
             assert len(t) == 3
             return (evaluate(t[1], context) + evaluate(t[2], context)) & MASK
-        # TODO: fold
+        # TODO: if0
+        elif op == FOLD:
+            _, bytes, start, fn = t
+            bytes = evaluate(bytes, context)
+            accum = evaluate(start, context)
+            for i in range(8):
+                byte = (bytes >> i*8) & 255
+                accum = apply(fn, context, byte, accum)
+            return accum
         else:
             assert False, t
     else:

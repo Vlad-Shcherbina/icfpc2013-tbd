@@ -1248,3 +1248,92 @@ def test13():
     eq_(
         apply(('lambda', ('x',), ('plus', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), 'x')), {}, 14864741614097609483),
         16017945695357121308)
+
+
+def test14():
+    # (lambda (x) (fold x 1153204081259511825 (lambda (y z) (xor (shl1 y) z))))
+
+    # on 0
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 0),
+        1153204081259511825)
+
+    # on 1
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 1),
+        1153204081259511827)
+
+    # on 16
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 16),
+        1153204081259511857)
+
+    # on 65536
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 65536),
+        1153204081259511827)
+
+    # on 4294967296
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 4294967296),
+        1153204081259511827)
+
+    # on 9223372036854775808
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 9223372036854775808),
+        1153204081259512081)
+
+    # on 18446744073709551615
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 18446744073709551615),
+        1153204081259511825)
+
+    # on 2053695854357871005
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 2053695854357871005),
+        1153204081259511897)
+
+    # on 5073395517033431291
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 5073395517033431291),
+        1153204081259512295)
+
+    # on 10060236952204337488
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 10060236952204337488),
+        1153204081259511933)
+
+    # on 7783083932390163561
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 7783083932390163561),
+        1153204081259512191)
+
+    # on 1728372192399379054
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 1728372192399379054),
+        1153204081259512231)
+
+    # on 10353144037217341363
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 10353144037217341363),
+        1153204081259511929)
+
+    # on 7738774760351418614
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 7738774760351418614),
+        1153204081259512161)
+
+    # on 10870033277113031978
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 10870033277113031978),
+        1153204081259511839)
+
+    # on 16035760590688802187
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 16035760590688802187),
+        1153204081259512207)
+
+    # on 14864741614097609483
+    eq_(
+        apply(('lambda', ('x',), ('fold', 'x', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('plus', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', ('shl1', 1L)))))))))))), 1))))))))), 1)))))))))), 1)))))))), 1))))))))), 1))))))))))))), 1))))), 1), ('lambda', ('y', 'z'), ('xor', ('shl1', 'y'), 'z')))), {}, 14864741614097609483),
+        1153204081259512131)

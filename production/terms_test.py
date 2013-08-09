@@ -13,6 +13,13 @@ def test_to_str():
 def test_eval():
     eq_(evaluate((PLUS, 'x', 1), dict(x=42)), 43)
 
+    eq_(apply(
+            (LAMBDA, ('x',),
+                (FOLD, 'x', 0, (LAMBDA, ('y', 'z'), (OR, 'y', 'z')))),
+            {},
+            0x1122334455667788),
+        0x00000000000000ff)
+
 
 def test_size():
     eq_(term_size(0), 1)
