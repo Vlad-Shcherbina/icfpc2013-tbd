@@ -84,3 +84,14 @@ def subst(t, replacements={}):
     if isinstance(t, tuple):
         return tuple(subst(tt, replacements) for tt in t)
     return t
+
+
+def term_size(t):
+    if isinstance(t, tuple):
+        if t[0] == 'lambda':
+            assert len(t) == 3
+            return 1 + term_size(t[2])
+        else:
+            # fold is covered by this case
+            return sum(map(term_size, t))
+    return 1

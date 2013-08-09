@@ -12,3 +12,10 @@ def test_to_str():
 
 def test_eval():
     eq_(evaluate((PLUS, 'x', 1), dict(x=42)), 43)
+
+
+def test_size():
+    eq_(term_size(0), 1)
+    eq_(term_size((LAMBDA, ('x', ), 'x')), 2)
+    eq_(term_size((PLUS, 0, 1)), 3)
+    eq_(term_size((FOLD, 0, 1, (LAMBDA, ('x', 'y'), 0))), 5
