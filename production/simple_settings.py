@@ -7,10 +7,10 @@ Database is created/connected lazily, on first access.
 
 All settings are stored as, and automatically converted to, strings, so take care to convert them back. 
 
->>> from simple_settings import settings
->>> print settings['some setting']
->>> print settings.get_value('some other setting', 'default value')
->>> settings['some other setting'] = 'modified value'
+>> from simple_settings import settings
+>> print settings['some setting']
+>> print settings.get_value('some other setting', 'default value')
+>> settings['some other setting'] = 'modified value'
 
 mailto:fj.mail@gmail.com
 '''
