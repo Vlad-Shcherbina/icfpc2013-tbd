@@ -22,6 +22,17 @@ def simple_terms(size, leafs, unaries, binaries):
                     yield (op, t1, t2)
 
 
+def tfold_terms(size, leafs, unaries, binaries):
+    if size < 5:
+        return
+    assert 'y' not in leafs
+    assert 'z' not in leafs
+    for s in range(1, size-2):
+        for t1 in simple_terms(s, leafs + ['y', 'z'], unaries, binaries):
+            for t2 in simple_terms(size-2-1-s, leafs, unaries, binaries):
+                yield (FOLD, 'x', t2, (LAMBDA, ('y', 'z'), t1))
+
+
 if __name__ == '__main__':
     for size in range(2, 11):
         cnt = 0
