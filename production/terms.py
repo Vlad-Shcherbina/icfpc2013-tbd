@@ -91,6 +91,17 @@ def evaluate(t, context={}):
             assert False, t
 
 
+# Test z3 eval (slow)
+if False:
+    import z3_utils
+    evaluate1 = evaluate
+    def evaluate(t, context={}):
+        result = evaluate1(t, context)
+        q = z3_utils.z3_eval_term(t, context)
+        assert q == result
+        return result
+
+
 def subst(t, replacements={}):
     if t in replacements:
         return replacements[t]
