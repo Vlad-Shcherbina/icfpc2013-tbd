@@ -50,22 +50,37 @@ def actually_fucking_solve(solver):
     print 'Detailed logs are written to log.txt.'
     print 'Any failures have to be carefully investigated,'
     print 'because that\'s fucking POINTS we are talking about!'
-    print 'Don\'t forget to ask teammates for exclusive access to the server!'
+    print 'Don\'t forget to ask teammates for '
+    print 'exclusive access to the server!!!'
+    print
+    print 'Also, make sure that solver showed itself excellent in training'
     print '*'*50
+
+    print 'do you think it\'s a good idea to try to solve all this shit'
+    print 'with {}?'.format(solver)
+    answer = raw_input()
+    if answer != 'yes':
+        exit()
+
+    print '************'
+    print 'DO NOT TERMINATE EXCEPT ON THE "waiting" MESSAGE!!!'
 
     for problem in problems:
         print 'waiting 20s...'
         time.sleep(20)  # sleep to clear any resource window for sure
 
-        print 'do you think it\'s a good idea to try to solve'
-        print problem
-        print 'with {}?'.format(solver)
-        answer = raw_input()
-        if answer != 'yes':
-            exit()
-        logging.info('solving {}'.format(problem))
-        logging.info('using {}'.format(solver))
+        #print 'do you think it\'s a good idea to try to solve'
+        #print problem
+        #print 'with {}?'.format(solver)
+        #answer = raw_input()
+        #if answer != 'yes':
+        #    exit()
+
+        logger.info('solving {}'.format(problem))
+        logger.info('using {}'.format(solver))
         solver.solve(problem)
+
+    print 'done'
 
 
 def setup_dual_logging():
