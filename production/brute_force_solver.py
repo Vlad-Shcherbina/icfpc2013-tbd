@@ -7,7 +7,7 @@ from random import randrange
 
 from terms import *
 from communicate import Problem, get_training_problem
-from enum_terms import simple_terms, tfold_terms
+from enum_terms import enumerate_terms
 
 
 NUMBERS_TO_TEST = [0] + [1 << i for i in [1, 2, 3, 4, 5, 15, 16, 31, 32, 63]]
@@ -45,15 +45,7 @@ class Solver(object):
     def solve(cls, problem):
         assert cls.is_applicable(problem)
 
-        unaries = [op for op in UNARY_OPS if op in problem.operators]
-        binaries = [op for op in BINARY_OPS if op in problem.operators]
-
-        if 'tfold' in problem.operators:
-            candidates = tfold_terms(
-                problem.size-1, CONSTANTS + ['x'], unaries, binaries)
-        else:
-            candidates = simple_terms(
-                problem.size-1, CONSTANTS + ['x'], unaries, binaries)
+        candidates = enumerate_terms(problem.size-1, problem.operators)
 
         start = time.clock()
         while True:
@@ -83,7 +75,7 @@ class Solver(object):
 
             candidates = new_candidates
             logger.info(
-                '{} candidates (possibly eqivalent)'.format(len(candidates)))
+                '{} candidates (possibly equivalent)'.format(len(candidates)))
 
             assert len(candidates) > 0
 

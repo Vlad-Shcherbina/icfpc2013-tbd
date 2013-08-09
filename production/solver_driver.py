@@ -9,7 +9,6 @@ from collections import Counter
 from terms import *
 from communicate import get_status, Problem
 from communicate import get_real_problems, get_training_problem
-from enum_terms import simple_terms
 
 import brute_force_solver
 
