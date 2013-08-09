@@ -7,7 +7,8 @@ import random
 from collections import Counter
 
 from terms import *
-from communicate import get_status, Problem, get_training_problem
+from communicate import get_status, Problem
+from communicate import get_real_problems, get_training_problem
 from enum_terms import simple_terms
 
 import brute_force_solver
@@ -35,6 +36,38 @@ def train(solver):
         time.sleep(10)
 
 
+def actually_fucking_solve(solver):
+    problems = get_real_problems()
+    problems = [
+        p for p in problems if p.solved is None and solver.is_applicable(p)]
+    logger.info(
+        'following {} problems look amenable to {}'
+        .format(len(problems), solver))
+    for p in problems:
+        logger.info(str(p))
+
+    print '*'*50
+    print 'Detailed logs are written to log.txt.'
+    print 'Any failures have to be carefully investigated,'
+    print 'because that\'s fucking POINTS we are talking about!'
+    print 'Don\'t forget to ask teammates for exclusive access to the server!'
+    print '*'*50
+
+    for problem in problems:
+        print 'waiting 20s...'
+        time.sleep(20)  # sleep to clear any resource window for sure
+
+        print 'do you think it\'s a good idea to try to solve'
+        print problem
+        print 'with {}?'.format(solver)
+        answer = raw_input()
+        if answer != 'yes':
+            exit()
+        logging.info('solving {}'.format(problem))
+        logging.info('using {}'.format(solver))
+        solver.solve(problem)
+
+
 def setup_dual_logging():
     logging.getLogger().setLevel(logging.DEBUG)
 
@@ -56,8 +89,10 @@ if __name__ == '__main__':
 
     solver = brute_force_solver.Solver()
 
-    print get_status()
-    time.sleep(5)
+    #print get_status()
+    #time.sleep(5)
 
-    train(solver)
+    #train(solver)
+
+    actually_fucking_solve(solver)
 
