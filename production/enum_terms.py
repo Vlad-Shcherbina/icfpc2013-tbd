@@ -39,22 +39,11 @@ def base_enum(size, required_ops, allowed_ops):
             if len(req) == 0 and size == 1:
                 yield op
         elif op in UNARY_OPS:
-            for t in base_enum(size-1, req, allowed_ops):
-                yield (op, t)
+            for t in enum_unary(op, size, req, allowed_ops):
+                yield t
         elif op in BINARY_OPS:
-            for size1 in range(1, size):
-                size2 = size - 1 - size1
-                if size2 < 1:
-                    continue
-                for req1 in frozen_powerset(req):
-                    req2 = req - req1
-                    if size_lower_bound(req2) > size2:
-                        continue
-                    for t1 in base_enum(size1, req1, allowed_ops-req2):
-                        for t2 in base_enum(size2, req2, allowed_ops):
-                            if t2 > t1:
-                                continue
-                            yield (op, t1, t2)
+            for t in enum_binary(op, size, req, allowed_ops):
+                yield t
         elif op == IF0:
             for t in enum_if0(size, req, allowed_ops):
                 yield t
@@ -63,6 +52,27 @@ def base_enum(size, required_ops, allowed_ops):
                 yield t
         else:
             assert False
+
+
+def enum_unary(op, size, required_ops, allowed_ops):
+    for t in base_enum(size-1, required_ops, allowed_ops):
+       yield (op, t)
+
+
+def enum_binary(op, size, required_ops, allowed_ops):
+    for size1 in range(1, size):
+        size2 = size - 1 - size1
+        if size2 < 1:
+            continue
+        for req1 in frozen_powerset(required_ops):
+            req2 = required_ops - req1
+            if size_lower_bound(req2) > size2:
+                continue
+            for t1 in base_enum(size1, req1, allowed_ops-req2):
+                for t2 in base_enum(size2, req2, allowed_ops):
+                    if t2 > t1:
+                        continue
+                    yield (op, t1, t2)
 
 
 def enum_fold(size, required_ops, allowed_ops, top_level):
