@@ -31,7 +31,7 @@ def random_interesting_number():
 class Solver(object):
     @classmethod
     def supported_sizes(cls):
-        return range(12, 12+1)
+        return range(3, 12+1)
 
     @classmethod
     def is_applicable(cls, problem):
@@ -43,47 +43,55 @@ class Solver(object):
     def solve(cls, problem):
         assert cls.is_applicable(problem)
 
-        num_tries = [0]
-        def candidate_matches(candidate):
-            num_tries[0] += 1
-            return all(
-                evaluate(candidate, dict(x=x)) == y
-                for x, y in problem.values.items())
+        def filter_candidates(candidates):
+            num_tries = 0
+            for candidate in candidates:
+                num_tries += 1
+                if all(
+                    evaluate(candidate, dict(x=x)) == y
+                    for x, y in problem.values.items()):
+
+                    stats.add_value(
+                        problem.kind()+'_tries_to_find_candidate', num_tries)
+                    yield candidate
 
         candidates = enumerate_terms(problem.size-1, problem.operators)
-        candidates = itertools.ifilter(candidate_matches, candidates)
+        candidates = filter_candidates(candidates)
 
-        attempts = 0
-        start = time.time()
-        while True:
-            time.sleep(5)
-            xs = []
-            for i in NUMBERS_TO_TEST:
-                if i not in problem.values:
-                    xs.append(i)
-            assert len(xs) <= 256
-            while len(xs) < 256:
-                while True:
-                    x = random_interesting_number()
-                    if x not in problem.values and x not in xs:
-                        xs.append(x)
-                        break
+        basic_solver_loop(problem, candidates, logger)
 
-            problem.request_eval(xs)
-            logger.info('{} data points'.format(len(problem.values)))
 
-            candidate = next(candidates, None)
-            stats.add_value(
-                problem.kind()+'_tries_to_find_candidate', num_tries[0])
-            assert candidate is not None
+def basic_solver_loop(problem, candidates, logger):
+    attempts = 0
+    start = time.time()
+    while True:
+        time.sleep(5)
+        xs = []
+        for i in NUMBERS_TO_TEST:
+            if i not in problem.values:
+                xs.append(i)
+        assert len(xs) <= 256
+        while len(xs) < 256:
+            while True:
+                x = random_interesting_number()
+                if x not in problem.values and x not in xs:
+                    xs.append(x)
+                    break
 
-            program = (LAMBDA, ('x',), candidate)
+        problem.request_eval(xs)
+        logger.info('{} data points'.format(len(problem.values)))
 
-            attempts += 1
-            if problem.guess(term_to_str(program)):
-                logger.info('solved!')
-                stats.add_value(problem.kind()+'_time', time.time()-start)
-                stats.add_value(problem.kind()+'_attempts', attempts)
-                break
+        candidate = next(candidates, None)
 
-            logger.warning('wrong guess')
+        assert candidate is not None
+
+        program = (LAMBDA, ('x',), candidate)
+
+        attempts += 1
+        if problem.guess(term_to_str(program)):
+            logger.info('solved!')
+            stats.add_value(problem.kind()+'_time', time.time()-start)
+            stats.add_value(problem.kind()+'_attempts', attempts)
+            break
+
+        logger.warning('wrong guess')
