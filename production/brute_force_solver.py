@@ -71,7 +71,7 @@ class Solver(object):
         candidates = enumerate_terms(problem.size-1, problem.operators)
         candidates = filter_candidates(candidates)
 
-        basic_solver_loop(problem, candidates, logger)
+        return basic_solver_loop(problem, candidates, logger)
 
 
 def basic_solver_loop(problem, candidates, logger):
@@ -105,6 +105,6 @@ def basic_solver_loop(problem, candidates, logger):
             logger.info('solved!')
             stats.add_value(problem.kind()+'_time', time.time()-start)
             stats.add_value(problem.kind()+'_attempts', attempts)
-            break
+            return term_to_str(program)
 
         logger.warning('wrong guess')

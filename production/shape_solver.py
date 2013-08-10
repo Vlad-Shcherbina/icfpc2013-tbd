@@ -84,9 +84,7 @@ class Solver(object):
         shapes = enumerate_terms(problem.size-1, problem.operators, shapes=True)
         candidates = find_candidates(shapes)
 
-        #next(shape)
-
-        basic_solver_loop(problem, candidates, logger)
+        return basic_solver_loop(problem, candidates, logger)
 
 
 if __name__ == '__main__':

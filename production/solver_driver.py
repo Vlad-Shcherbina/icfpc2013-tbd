@@ -9,6 +9,7 @@ from terms import *
 from communicate import get_status, Problem
 from communicate import get_real_problems, get_training_problem
 import stats
+from solution_db import add_solved_problem
 
 import brute_force_solver
 import shape_solver
@@ -79,7 +80,9 @@ def actually_fucking_solve(solver):
 
         logger.info('solving {}'.format(problem))
         logger.info('using {}'.format(solver))
-        solver.solve(problem)
+        solution = solver.solve(problem)
+
+        add_solved_problem(problem.id, False, problem.size, problem.operators, solution)
 
         stats.add_value('solved', 0)
         stats.log_stats()
@@ -106,8 +109,8 @@ def setup_dual_logging():
 if __name__ == '__main__':
     setup_dual_logging()
 
-    #solver = brute_force_solver.Solver()
-    solver = shape_solver.Solver()
+    solver = brute_force_solver.Solver()
+    #solver = shape_solver.Solver()
 
     #print get_status()
     #time.sleep(5)
