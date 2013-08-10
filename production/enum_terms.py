@@ -1,7 +1,7 @@
 from terms import *
 from utils import cached, frozen_powerset
-
 from z3_utils import *
+from distinct import filter_distinct
 
 import logging
 logger = logging.getLogger('enum')
@@ -103,6 +103,9 @@ def enum_if0(size, required_ops, allowed_ops):
         if size23 < 2:
             continue
         for req1 in frozen_powerset(required_ops):
+            if size_lower_bound(req1) > size1:
+                # to avoid caching empty lists in generate_distinct_predicates
+                continue
             req23 = required_ops - req1
             if size_lower_bound(req23)+1 > size23:
                 # plus 1 because there are two terms
@@ -125,38 +128,9 @@ def enum_if0(size, required_ops, allowed_ops):
 @cached
 def generate_distinct_predicates(size, required_ops, allowed_ops):
     logger.debug('generate distinct predicates {} {} {}'.format(size, required_ops, allowed_ops))
-    predicates = []
-    for t in base_enum(size, required_ops, allowed_ops):
-        for p in predicates:
-            if predicates_equivalent(p, t, in_fold_lambda='y' in allowed_ops):
-                break
-        else:
-            predicates.append(t)
+    predicates = filter_distinct(base_enum(size, required_ops, allowed_ops))
     logger.debug('{} predicates'.format(len(predicates)))
     return predicates
-
-
-X = z3.BitVec('x', 64)
-Y = z3.BitVec('y', 64)
-Z = z3.BitVec('z', 64)
-def predicates_equivalent(t1, t2, in_fold_lambda=False):
-    if in_fold_lambda:
-        vars=dict(x=X, y=Y, z=Z)
-    else:
-        vars=dict(x=X)
-    t1 = term_to_z3(t1, vars)
-    t2 = term_to_z3(t2, vars)
-
-    with PushPop():
-        z3_solver.add((t1==0) != (t2==0))
-
-        result = z3_solver.check()
-        if result == z3.unsat:
-            return True
-        elif result == z3.sat:
-            return False
-        else:
-            assert False, result
 
 
 def enumerate_terms(size, operators):
