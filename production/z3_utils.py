@@ -34,6 +34,12 @@ def fresh_var_name(prefix='fresh'):
     return prefix+str(fresh_index)
 
 
+def fresh_control(operations):
+    if len(operations) == 1:
+        return operations[0]
+    return Control(z3.Int(fresh_var_name('control')), operations)
+
+
 def inject_controls(t, control_map):
     """
     control_map is something like
@@ -43,7 +49,7 @@ def inject_controls(t, control_map):
     controls = []
     def replacer(leaf):
         if leaf in control_map:
-            c = Control(z3.Int(fresh_var_name('control')), control_map[leaf])
+            c = fresh_control(control_map[leaf])
             controls.append(c)
             return c
         return leaf
