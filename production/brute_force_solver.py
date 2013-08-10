@@ -9,6 +9,7 @@ import itertools
 from terms import *
 from communicate import Problem, get_training_problem
 from enum_terms import enumerate_terms
+import stats
 
 
 NUMBERS_TO_TEST = [0] + [1 << i for i in [1, 2, 3, 4, 5, 15, 16, 31, 32, 63]]
@@ -54,7 +55,7 @@ class Solver(object):
         candidates = enumerate_terms(problem.size-1, problem.operators)
         candidates = itertools.ifilter(candidate_matches, candidates)
 
-        start = time.clock()
+        start = time.time()
         while True:
             time.sleep(5)
             xs = []
@@ -73,14 +74,15 @@ class Solver(object):
             logger.info('{} data points'.format(len(problem.values)))
 
             candidate = next(candidates, None)
-            logger.info('candidate found in {} tries'.format(num_tries[0]))
+            stats.add_value(
+                problem.kind()+'_tries_to_find_candidate', num_tries[0])
             assert candidate is not None
 
-            logger.info(
-                'time since start: {:.1f}s'.format(time.clock() - start))
             program = (LAMBDA, ('x',), candidate)
             if problem.guess(term_to_str(program)):
                 logger.info('solved!')
+                stats.add_value(problem.kind()+'_time', time.time()-start)
                 break
+
 
             logger.warning('wrong guess')

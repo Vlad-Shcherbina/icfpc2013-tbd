@@ -71,6 +71,14 @@ class Problem(object):
         self.values = {}
         self.solved = None
 
+    def kind(self):
+        result = 'size' + str(self.size)
+        if 'tfold' in self.operators:
+            result += 'tfold'
+        elif 'fold' in self.operators:
+            result += 'fold'
+        return result
+
     @staticmethod
     def from_json(js):
         result = Problem(

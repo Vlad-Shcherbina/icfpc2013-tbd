@@ -4,31 +4,28 @@ logger = logging.getLogger('driver')
 import sys
 import time
 import random
-from collections import Counter
 
 from terms import *
 from communicate import get_status, Problem
 from communicate import get_real_problems, get_training_problem
+import stats
 
 import brute_force_solver
 
 
 def train(solver):
     logger.info('================= training  ==================')
-    solved = Counter()
     while True:
         logger.info('----------- trying another problem ------------')
         size = random.choice(solver.supported_sizes())
-        p = get_training_problem(size=size) #, operators=['tfold'])
+        p = get_training_problem(size=size)# , operators=['tfold'])
 
         logger.info(str(p))
 
         if solver.is_applicable(p):
             solver.solve(p)
-            solved[size] += 1
-            logger.info(
-                'Successfully solved problems of various sizes: {}'
-                .format(solved))
+            stats.add_value('solved', 0)
+            stats.log_stats()
         else:
             logger.info('dunno how to solve')
 
@@ -78,6 +75,9 @@ def actually_fucking_solve(solver):
         logger.info('solving {}'.format(problem))
         logger.info('using {}'.format(solver))
         solver.solve(problem)
+
+        stats.add_value('solved', 0)
+        stats.log_stats()
 
     print 'done'
 

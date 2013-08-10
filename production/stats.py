@@ -10,6 +10,7 @@ stats = defaultdict(list)
 
 
 def add_value(name, value):
+    logger.debug('{} {}'.format(name, value))
     stats[name].append(value)
 
 
