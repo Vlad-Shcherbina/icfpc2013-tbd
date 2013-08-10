@@ -31,6 +31,8 @@ def list_stats_to_str(xs):
         result.append('sigma={:.1f}'.format(sigma))
         result.append('min={}'.format(min(xs)))
         result.append('max={}'.format(max(xs)))
+        if len(xs) > 2:
+            result.append('next_to_max={}'.format(sorted(xs)[-2]))
 
     return ', '.join(result)
 
