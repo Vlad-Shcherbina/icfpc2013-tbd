@@ -11,6 +11,7 @@ from communicate import get_real_problems, get_training_problem
 import stats
 
 import brute_force_solver
+import shape_solver
 
 
 def train(solver):
@@ -105,7 +106,8 @@ def setup_dual_logging():
 if __name__ == '__main__':
     setup_dual_logging()
 
-    solver = brute_force_solver.Solver()
+    #solver = brute_force_solver.Solver()
+    solver = shape_solver.Solver()
 
     #print get_status()
     #time.sleep(5)

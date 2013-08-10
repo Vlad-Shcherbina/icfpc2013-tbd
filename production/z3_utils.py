@@ -24,7 +24,7 @@ class Control(object):
         if 0 <= value < len(self.operations):
             return self.operations[value]
         else:
-            self.operations[-1]
+            return self.operations[-1]
 
 
 fresh_index = 0
@@ -65,7 +65,7 @@ def instantiate_controls_from_model(term, model):
             return leaf.decode(model)
         return leaf
 
-    return subst(t, leaf_replacer=replacer)
+    return subst(term, leaf_replacer=replacer)
 
 
 def z3_switch(control, *options):
@@ -85,10 +85,12 @@ def term_to_z3(t, vars={}):
         args = [term_to_z3(arg, vars) for arg in t[1:]]
         formal_args = tuple('tmp'+str(i) for i in range(len(args)))
         possibilities = []
+        new_vars = dict(vars)
+        new_vars.update(zip(formal_args, args))
         for operation in op.operations:
             possibilities.append(term_to_z3(
                 (operation,) + formal_args,
-                vars=dict(zip(formal_args, args))))
+                vars=new_vars))
         return z3_switch(op.z3var, *possibilities)
     elif isinstance(op, (int, long)):
         assert len(t) == 1
