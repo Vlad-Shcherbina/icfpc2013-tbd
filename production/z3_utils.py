@@ -54,7 +54,7 @@ def term_to_z3(t, vars={}):
             new_vars = dict(vars)
             for i in range(8):
                 new_vars[formal_y] = \
-                    z3.Concat(zero56, z3.z3.Extract(8*i+7, 8*i, bytes))
+                    z3.Concat(zero56, z3.Extract(8*i+7, 8*i, bytes))
                 new_vars[formal_z] = accum
                 accum = term_to_z3(body, new_vars)
             return accum

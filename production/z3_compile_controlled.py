@@ -76,7 +76,7 @@ def term_to_z3_controlled(t, vars, controls):
             
             for i in range(8):
                 new_vars[formal_y] = \
-                    z3.Concat(zero56, z3.z3.Extract(8*i+7, 8*i, bytes))
+                    z3.Concat(zero56, z3.Extract(8*i+7, 8*i, bytes))
                 new_vars[formal_z] = accum
                 # on the first iteration proceed to add controls as usual, on the subsequent iterations
                 # reset controls.reuse_idx to the captured base value. 
