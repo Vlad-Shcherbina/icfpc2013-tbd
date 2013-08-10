@@ -103,11 +103,16 @@ if False:
         return result
 
 
-def subst(t, replacements={}):
+def subst(t, replacements={}, leaf_replacer=None):
     if t in replacements:
         return replacements[t]
     if isinstance(t, tuple):
-        return tuple(subst(tt, replacements) for tt in t)
+        return tuple(
+            subst(tt, replacements, leaf_replacer=leaf_replacer) for tt in t)
+
+    if leaf_replacer is not None:
+        return leaf_replacer(t)
+
     return t
 
 
@@ -164,19 +169,19 @@ def tokenize(s):
 def parse_term(s):
     tokens = tokenize(s)
     context = {}
-    
+
     # parser functions
     def expect(expected):
         token, pos = tokens.pop()
         assert expected == token, 'Invalid token at %d: %r, expected %r' % (pos, token, expected)\
-    
+
     def check_id_declaration(token, pos):
         assert identifier_rx.match(token), 'Expected identifier at %d, got %r' % (pos, token)
 
     def check_id_use(token, pos):
         check_id_declaration(token, pos)
         assert token in context, 'Undefined identifier at %d: %r (in scope: %r)' % (pos, token, context)
-    
+
     def parse_expression(tokens):
         token, pos = tokens.pop()
         if token == '(':
@@ -209,8 +214,8 @@ def parse_term(s):
             else:
                 check_id_use(token, pos)
                 return token
-    
-    
+
+
     def parse_lambda(argcount, tokens):
         expect('(')
         expect('lambda')
@@ -224,7 +229,7 @@ def parse_term(s):
             check_id_declaration(id, pos)
             ids.append(id)
             old_bindings.append((id, context.get(id, undefined)))
-            context[id] = 'input' if argcount == 1 else 'fold_arg' + str(i) 
+            context[id] = 'input' if argcount == 1 else 'fold_arg' + str(i)
         expect(')')
         e = parse_expression(tokens)
         expect(')')
@@ -235,7 +240,7 @@ def parse_term(s):
             else:
                 context[id] = value
         return (LAMBDA, tuple(ids), e)
-    
+
     # execution
     parsing_result = parse_lambda(1, tokens)
     assert not len(tokens), 'Trailing identifiers: %s' % ' '.join(
