@@ -1,7 +1,11 @@
-from common_initialization import log, settings
+import sys
+import psycopg2
 from pprint import pprint
 from contextlib import contextmanager
-import psycopg2
+
+from simple_settings import settings
+import logging
+log = logging.getLogger('solution_db')
 
 from communicate import get_training_problem
 
@@ -24,14 +28,6 @@ def db_execute(db, *args, **kwargs):
     finally:
         cur.close()
     
-def main2():
-    db_host, db_password = settings['db_host'], settings['db_password']
-    sslmode = 'require'
-    with psycopg2.connect(host=db_host, database='postgres', user='tbd', password=db_password, sslmode=sslmode) as db:
-        with db_execute(db, 'select * from test') as cur:
-            pprint(cur.fetchall())
-    db.close()
-
 _db = None
 def get_db():
     global _db
@@ -39,6 +35,7 @@ def get_db():
         db_host, db_password = settings['db_host'], settings['db_password']
         _db = psycopg2.connect(host=db_host, database='postgres', user='tbd', password=db_password, sslmode='require')
     return _db
+
 
 def create_structure(db):
     '''For historical purposes'''
@@ -59,21 +56,23 @@ def create_structure(db):
         
     
 def add_solved_problem(id, training, size, operators, solution, extra = None):
+    log.debug('Storing problem in the solution database')
     db = get_db()
     with db:
         with db_execute(db, '''
             insert into solved_problems (id, training, size, operators, solution, extra)
             values (%s, %s, %s, %s, %s, %s)''',
             (id, training, size, ' '.join(sorted(operators)), solution, extra)): pass
-    log.debug('Stored problem %r in the problem database', id)
+    log.debug('Stored problem %r in the solution database', id)
     
 
 def main():
+    logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
+    log.info('Yo!')
     p = get_training_problem()
     add_solved_problem(p.id, True, p.size, p.operators, p.solution)
+    log.info('done')
 
 
 if __name__ == '__main__':
-    log.info('Yo!')
     main()
-    log.info('done')

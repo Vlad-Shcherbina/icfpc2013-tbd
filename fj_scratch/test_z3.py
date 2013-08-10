@@ -1,4 +1,5 @@
 from z3 import *
+describe_tactics()
 
 f = Function('f', IntSort(), IntSort(), IntSort())
 x, y = Ints('x y')

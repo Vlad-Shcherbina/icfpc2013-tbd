@@ -17,6 +17,7 @@ def is_actual_problem(problem_id):
     assert _id_rx.match(problem_id), problem_id
     
     def sanity_check(ids):
+        assert len(ids) == 1420 + 200
         assert all(_id_rx.match(id) for id in ids)
         
     if _cached_problem_ids is None:

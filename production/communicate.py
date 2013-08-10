@@ -141,7 +141,8 @@ def get_training_problem(size=None, operators=None):
     p.solution = str(r['challenge'])
     from statistics import is_actual_problem
     assert not is_actual_problem(p.id)
-
+    from solution_db import add_solved_problem
+    add_solved_problem(p.id, True, p.size, p.operators, p.solution)
     return p
 
 def get_real_problems():
