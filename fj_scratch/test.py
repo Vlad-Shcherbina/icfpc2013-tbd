@@ -5,6 +5,11 @@ import pickle, json, os, re
 from os import path as os_path
 from communicate import Problem, send, get_training_problem
 
+def update_problem_dump():
+    with open('../data/myproblems.json', 'wb') as f:
+        json.dump(send('myproblems'), f, indent=4)
+
+
 def load_cached(fname, f):
     if os_path.exists(fname):
         with open(fname, 'rb') as f:
@@ -17,6 +22,7 @@ def load_cached(fname, f):
         
 
 def main():
+    
     problems = load_cached('temp_problems.pickle', lambda: send('myproblems'))
     print len(problems)
 #    p = get_training_problem(5, [])
@@ -32,6 +38,7 @@ from terms import parse_term
 
 if __name__ == '__main__':
     log.info('Yo!')
-#    p = get_training_problem(30, ['tfold'])
+#    p = get_training_problem(42)
+#    pprint(p.solution)
 #    pprint(parse_term(p.solution))
-#    log.info('done')
+    log.info('done')

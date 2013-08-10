@@ -69,6 +69,8 @@ def print_problem_statistics():
         lambda p: not ('if0' in p.operators or 'fold' in p.operators or 'tfold' in p.operators))
     print_count_of_problems('has if0', problems, 
         lambda p: 'if0' in p.operators)
+    print_count_of_problems('bonus', problems, 
+        lambda p: 'bonus' in p.operators)
      
 
 if __name__ == '__main__':
