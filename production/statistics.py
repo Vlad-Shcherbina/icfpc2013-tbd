@@ -63,10 +63,12 @@ def print_problem_statistics():
     print_count_of_problems('has tfold', problems, lambda p: 'tfold' in p.operators) 
     print_count_of_problems('no folds', problems, 
         lambda p: not ('fold' in p.operators or 'tfold' in p.operators))
-    print_count_of_problems('no if0', problems, 
-        lambda p: not ('if0' in p.operators))
+    print_count_of_problems('no if0, has folds', problems, 
+        lambda p: not ('if0' in p.operators) and ('fold' in p.operators or 'tfold' in p.operators))
     print_count_of_problems('no if0 or folds', problems, 
         lambda p: not ('if0' in p.operators or 'fold' in p.operators or 'tfold' in p.operators))
+    print_count_of_problems('has if0', problems, 
+        lambda p: 'if0' in p.operators)
      
 
 if __name__ == '__main__':
