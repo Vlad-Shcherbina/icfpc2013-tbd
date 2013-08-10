@@ -61,7 +61,7 @@ def enum_fold(size, required_ops, allowed_ops, top_level):
     assert 'fold' not in allowed_ops
     for s1 in range(1, size-3):
         if top_level:
-            t1_candidates = ['x']
+            t1_candidates = ['x'] if s1 == 1 else []
         else:
             t1_candidates = base_enum(s1, set(), allowed_ops)
         for t1 in t1_candidates:
