@@ -15,7 +15,7 @@ logger = logging.getLogger('shape')
 class Solver(object):
     @classmethod
     def supported_sizes(cls):
-        return range(9, 9+1)
+        return range(7, 7+1)
 
     @classmethod
     def is_applicable(cls, problem):
@@ -43,31 +43,27 @@ class Solver(object):
                 def check(z3t, values):
                     K = 5
                     with PushPop():
-                        for x, y in values[:K]:
+                        candidate = 0
+
+                        for i, (x, y) in enumerate(values):
                             instance = z3.substitute(
                                 z3t, (input_var, z3.BitVecVal(x, 64)))
                             z3_solver.add(instance == y)
 
-                        with stats.TimeIt('toplevel z3.solve'):
-                            result = z3_solver.check()
+                            if evaluate(candidate, dict(x=x)) != y:
+                                logging.debug('refining model at {}'.format(i))
 
-                        if result == z3.sat:
-                            model = z3_solver.model()
-                            candidate = instantiate_controls_from_model(shape, model)
+                            with stats.TimeIt('toplevel z3.solve'):
+                                result = z3_solver.check()
 
-                            for i in range(K, len(values)):
-                                x, y = values[i]
-                                if evaluate(candidate, dict(x=x)) != y:
-                                    logging.info('refining model')
-                                    return check(z3t, values[i:])
+                            if result == z3.sat:
+                                model = z3_solver.model()
+                                candidate = instantiate_controls_from_model(shape, model)
+                            elif result == z3.unsat:
+                                return None
                             else:
-                                logging.info('found model {}'.format(model))
-                                return candidate
-
-                        elif result == z3.unsat:
-                            return None
-                        else:
-                            assert False, result
+                                assert False, result
+                        return candidate
 
                 while True:
                     candidate = check(z3t, problem.values.items())
