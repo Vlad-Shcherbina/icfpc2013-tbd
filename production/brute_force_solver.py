@@ -44,7 +44,9 @@ class Solver(object):
     def solve(cls, problem):
         assert cls.is_applicable(problem)
 
+        num_tries = [0]
         def candidate_matches(candidate):
+            num_tries[0] += 1
             return all(
                 evaluate(candidate, dict(x=x)) == y
                 for x, y in problem.values.items())
@@ -71,6 +73,7 @@ class Solver(object):
             logger.info('{} data points'.format(len(problem.values)))
 
             candidate = next(candidates, None)
+            logger.info('candidate found in {} tries'.format(num_tries[0]))
             assert candidate is not None
 
             logger.info(
