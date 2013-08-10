@@ -88,9 +88,9 @@ def enum_fold(size, required_ops, allowed_ops, top_level):
                     if size3 < 1:
                         continue
                     for req2 in frozen_powerset(req23):
-                        if size_lower_bound(req2) > size2:
-                            continue
                         req3 = req23 - req2
+                        if size_lower_bound(req3) > size3:
+                            continue
                         for t2 in base_enum(size2, req2, allowed_ops-req3):
                             for t3 in base_enum(
                                     size3, req3, allowed_ops | set('yz')):
@@ -109,14 +109,14 @@ def enum_if0(size, required_ops, allowed_ops):
                 continue
             for pred in generate_distinct_predicates(
                 size1, frozenset(req1), frozenset(allowed_ops-req23)):
-                for size2 in range(1, size):
+                for size2 in range(1, size23):
                     size3 = size23 - size2
                     if size3 < 1:
                         continue
                     for req2 in frozen_powerset(req23):
-                        if size_lower_bound(req2) > size2:
-                            continue
                         req3 = req23 - req2
+                        if size_lower_bound(req3) > size3:
+                            continue
                         for then in base_enum(size2, req2, allowed_ops-req3):
                             for else_ in base_enum(size3, req3, allowed_ops):
                                 yield (IF0, pred, then, else_)
