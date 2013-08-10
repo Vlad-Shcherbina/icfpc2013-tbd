@@ -32,7 +32,16 @@ def size_lower_bound(required_ops):
 
 def base_enum(size, required_ops, allowed_ops, shapes=False):
     if size_lower_bound(required_ops) > size:
-        return
+        return []
+
+    if not shapes and size < 6:
+        return generate_distinct_terms(
+            size, frozenset(required_ops), frozenset(allowed_ops))
+
+    return base_enum_impl(size, required_ops, allowed_ops, shapes=shapes)
+
+
+def base_enum_impl(size, required_ops, allowed_ops, shapes=False):
     if shapes:
         assert len(required_ops) == 0
         leafs = [op for op in [0, 1, 'x', 'y', 'z'] if op in allowed_ops]
@@ -177,9 +186,17 @@ def enum_predicates(size, required_ops, allowed_ops, shapes=False):
 
 
 @cached
+def generate_distinct_terms(size, required_ops, allowed_ops):
+    logger.debug('generate distinct terms {} {} {}'.format(size, required_ops, allowed_ops))
+    predicates = filter_distinct(base_enum_impl(size, required_ops, allowed_ops), as_predicates=False)
+    logger.debug('{} terms'.format(len(predicates)))
+    return predicates
+
+
+@cached
 def generate_distinct_predicates(size, required_ops, allowed_ops):
     logger.debug('generate distinct predicates {} {} {}'.format(size, required_ops, allowed_ops))
-    predicates = filter_distinct(base_enum(size, required_ops, allowed_ops))
+    predicates = filter_distinct(base_enum(size, required_ops, allowed_ops), as_predicates=True)
     logger.debug('{} predicates'.format(len(predicates)))
     return predicates
 
@@ -207,14 +224,14 @@ def enumerate_terms(size, operators, shapes=False):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
-    size = 10
-    operators = set([IF0, NOT, SHL1, AND, OR, FOLD])
-    #size = 7
-    #operators=frozenset(['tfold', 'or', 'if0'])
+    #size = 10
+    #operators = set([IF0, NOT, SHL1, AND, OR, FOLD])
+    size = 5
+    operators=frozenset(['or'])
 
     cnt = 0
-    for t in enumerate_terms(size, operators, shapes=True):
-        #print term_to_str(t)
+    for t in enumerate_terms(size, operators):
+        print term_to_str(t)
         assert term_size(t) == size
         #assert term_op(t) == operators
         cnt += 1

@@ -12,6 +12,18 @@ POINTS += [(1 << i) | (1 << j) for i in QQ for j in QQ if i < j]
 POINTS += [MASK^x for x in POINTS]
 
 
+def term_signature(t):
+    pts = [0x345034994, 0x4759607901000000, 0x0123400000^MASK]
+    result = 0
+    for pt in pts:
+        vars = dict(x=pt)
+        if FOLD not in repr(t):
+            vars['y'] = pt ^ 2345
+            vars['z'] = pt >> 5
+        result *= 7
+        result += evaluate(t, vars)
+    return asf
+
 def predicate_signature(t):
     result = 0
     for pt in POINTS:
@@ -29,14 +41,18 @@ Y = z3.BitVec('y', 64)
 Z = z3.BitVec('z', 64)
 
 
-def filter_distinct(terms):
+def filter_distinct(terms, as_predicates=False):
     predicates = []
 
     buckets = defaultdict(list)
 
+    if as_predicates:
+        signature_fn = predicate_signature
+    else:
+        signature_fn = term_signature
+
     for t in terms:
-        with stats.TimeIt('predicate_signature'):
-            signature = predicate_signature(t)
+        signature = predicate_signature(t)
 
         if FOLD in repr(t):
             zt = term_to_z3(t, dict(x=X))
@@ -46,7 +62,7 @@ def filter_distinct(terms):
         zt = z3.simplify(zt)
 
         for zz in buckets[signature]:
-            if predicates_equivalent(zz, zt):
+            if terms_equivalent(zz, zt, as_predicates=as_predicates):
                 break
         else:
             predicates.append(t)
@@ -55,9 +71,12 @@ def filter_distinct(terms):
     return predicates
 
 
-def predicates_equivalent(t1, t2):
+def terms_equivalent(t1, t2, as_predicates=False):
     with PushPop():
-        z3_solver.add((t1==0) != (t2==0))
+        if as_predicates:
+            z3_solver.add((t1==0) != (t2==0))
+        else:
+            z3_solver.add(t1 != t2)
 
         with stats.TimeIt('z3.check'):
             result = z3_solver.check()
@@ -76,9 +95,9 @@ if __name__ == '__main__':
 
     from enum_terms import base_enum
 
-    size = 5
-    required_ops = frozenset(['fold'])
-    allowed_ops = frozenset([0, 1, 'if0', 'fold', 'x'])
+    size = 3
+    required_ops = frozenset()
+    allowed_ops = frozenset([0, 1, 'if0', 'plus', 'shl1', 'x'])
 
     #size = 8
     #required_ops = frozenset(['not', 'plus', 'shr16', 'shr1', 'or'])
@@ -88,7 +107,14 @@ if __name__ == '__main__':
         terms = list(base_enum(size, required_ops, allowed_ops))
     print len(terms), 'terms'
 
-    preds = filter_distinct(terms)
+    preds = filter_distinct(terms, as_predicates=True)
     print len(preds), 'distinct predicates'
+    for pred in preds:
+        print pred
+
+    terms = filter_distinct(terms)
+    print len(terms), 'distinct terms'
+    for term in terms:
+        print term
 
     stats.log_stats()
