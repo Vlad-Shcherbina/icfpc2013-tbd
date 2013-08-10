@@ -116,6 +116,7 @@ def subst(t, replacements={}, leaf_replacer=None):
     return t
 
 
+from z3_utils import Control
 def term_size(t):
     if isinstance(t, tuple):
         if t[0] == LAMBDA:
@@ -124,6 +125,8 @@ def term_size(t):
         else:
             # fold is covered by this case
             return sum(map(term_size, t))
+    if isinstance(t, Control):
+        return term_size(t.operations[0])
     return 1
 
 
