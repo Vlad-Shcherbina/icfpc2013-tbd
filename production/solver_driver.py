@@ -36,6 +36,10 @@ def actually_fucking_solve(solver):
     problems = get_real_problems()
     problems = [
         p for p in problems if p.solved is None and solver.is_applicable(p)]
+
+    # To ensure that in case of failure we return to the same problem.
+    problems.sort(key=lambda p: (p.kind(), p.id))
+
     logger.info(
         'following {} problems look amenable to {}'
         .format(len(problems), solver))
