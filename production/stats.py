@@ -3,7 +3,7 @@ logger = logging.getLogger('stats')
 
 from math import sqrt
 
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 
 stats = defaultdict(list)
@@ -21,6 +21,8 @@ def list_stats_to_str(xs):
     result.append('n={}'.format(len(xs)))
     if len(xs) == 1:
         result.append(str(xs[0]))
+    elif all(x in range(100) for x in xs):
+        result.append(str(Counter(xs)))
     else:
         mean = 1.0*sum(xs)/len(xs)
         sigma2 = sum((x-mean)**2 for x in xs) / (len(xs)-1.0)

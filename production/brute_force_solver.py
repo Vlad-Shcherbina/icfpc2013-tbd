@@ -55,6 +55,7 @@ class Solver(object):
         candidates = enumerate_terms(problem.size-1, problem.operators)
         candidates = itertools.ifilter(candidate_matches, candidates)
 
+        attempts = 0
         start = time.time()
         while True:
             time.sleep(5)
@@ -79,10 +80,12 @@ class Solver(object):
             assert candidate is not None
 
             program = (LAMBDA, ('x',), candidate)
+
+            attempts += 1
             if problem.guess(term_to_str(program)):
                 logger.info('solved!')
                 stats.add_value(problem.kind()+'_time', time.time()-start)
+                stats.add_value(problem.kind()+'_attempts', attempts)
                 break
-
 
             logger.warning('wrong guess')
