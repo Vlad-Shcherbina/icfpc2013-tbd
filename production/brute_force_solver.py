@@ -31,11 +31,15 @@ def random_interesting_number():
 class Solver(object):
     @classmethod
     def supported_sizes(cls):
-        return range(3, 12+1)
+        return range(12, 12+1)
 
     @classmethod
     def is_applicable(cls, problem):
         if problem.size not in cls.supported_sizes():
+            return False
+        if 'fold' in problem.operators:
+            return False
+        if 'tfold' in problem.operators:
             return False
         return True
 
@@ -47,10 +51,19 @@ class Solver(object):
             num_tries = 0
             for candidate in candidates:
                 num_tries += 1
-                if all(
-                    evaluate(candidate, dict(x=x)) == y
-                    for x, y in problem.values.items()):
-
+                with stats.TimeIt('eval candidate'):
+                    fits = True
+                    cnt = 0
+                    for x, y in problem.values.items():
+                        cnt += 1
+                        if evaluate(candidate, dict(x=x)) != y:
+                            fits = False
+                            #stats.add_value('filter_candidate evals', cnt)
+                            break
+                    #fits = all(
+                    #    evaluate(candidate, dict(x=x)) == y
+                    #    for x, y in problem.values.items())
+                if fits:
                     stats.add_value(
                         problem.kind()+'_tries_to_find_candidate', num_tries)
                     yield candidate
