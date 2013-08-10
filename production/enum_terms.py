@@ -1,5 +1,5 @@
 from terms import *
-from utils import cached
+from utils import cached, frozen_powerset
 
 from z3_utils import *
 
@@ -26,67 +26,107 @@ MIN_SIZE = {
 }
 
 
+def size_lower_bound(required_ops):
+    return sum(MIN_SIZE[op] for op in required_ops) - len(required_ops) + 1
+
+
 def base_enum(size, required_ops, allowed_ops):
-    if sum(MIN_SIZE[op] for op in required_ops) - len(required_ops) + 1 > size:
+    if size_lower_bound(required_ops) > size:
         return
     for op in allowed_ops:
-        new_req = required_ops - set([op])
+        req = required_ops - set([op])
         if op in [0, 1, 'x', 'y', 'z']:
-            if len(new_req) == 0 and size == 1:
+            if len(req) == 0 and size == 1:
                 yield op
         elif op in UNARY_OPS:
-            for t in base_enum(size-1, new_req, allowed_ops):
+            for t in base_enum(size-1, req, allowed_ops):
                 yield (op, t)
         elif op in BINARY_OPS:
-            for s in range(1, size-1):
-                for t1 in base_enum(s, set(), allowed_ops):
-                    new_new_req = new_req - term_op(t1)
-                    for t2 in base_enum(size-1-s, new_new_req, allowed_ops):
-                        if t2 > t1:
-                            continue
-                        yield (op, t1, t2)
-                pass
+            for size1 in range(1, size):
+                size2 = size - 1 - size1
+                if size2 < 1:
+                    continue
+                for req1 in frozen_powerset(req):
+                    req2 = req - req1
+                    if size_lower_bound(req2) > size2:
+                        continue
+                    for t1 in base_enum(size1, req1, allowed_ops-req2):
+                        for t2 in base_enum(size2, req2, allowed_ops):
+                            if t2 > t1:
+                                continue
+                            yield (op, t1, t2)
         elif op == IF0:
-            for t in enum_if0(size, allowed_ops):
+            for t in enum_if0(size, req, allowed_ops):
                 yield t
         elif op == FOLD:
-            for t in enum_fold(size, new_req, allowed_ops - set([FOLD]), top_level=False):
+            for t in enum_fold(size, req, allowed_ops - set([FOLD]), top_level=False):
                 yield t
         else:
             assert False
 
 
 def enum_fold(size, required_ops, allowed_ops, top_level):
-    assert 'fold' not in required_ops
-    assert 'fold' not in allowed_ops
-    for s1 in range(1, size-3):
-        if top_level:
-            t1_candidates = ['x'] if s1 == 1 else []
-        else:
-            t1_candidates = base_enum(s1, set(), allowed_ops)
-        for t1 in t1_candidates:
-            new_req = required_ops - term_op(t1)
-            for s2 in range(1, size-2-s1):
-                for t2 in base_enum(s2, set(), allowed_ops):
-                    new_new_req = new_req - term_op(t2)
-                    for t3 in base_enum(size-2-s1-s2, new_new_req, allowed_ops | set('yz')):
-                        yield (FOLD, t1, t2, (LAMBDA, ('y', 'z'), t3))
+    # If top_level is true, first term is only allowed to be 'x'.
+    assert FOLD not in required_ops
+    assert FOLD not in allowed_ops
+    for size1 in range(1, size):
+        if top_level and size1 != 1:
+            continue
+        size23 = size - 2 - size1
+        if size23 < 2:
+            continue
+        for req1 in frozen_powerset(required_ops):
+            req23 = required_ops - req1
+            if size_lower_bound(req23)+1 > size23:
+                # plus 1 because there are two terms
+                continue
+            for t1 in base_enum(size1, req1, allowed_ops-req23):
+                if top_level and t1 != 'x':
+                    continue
+                for size2 in range(1, size23):
+                    size3 = size23 - size2
+                    if size3 < 1:
+                        continue
+                    for req2 in frozen_powerset(req23):
+                        if size_lower_bound(req2) > size2:
+                            continue
+                        req3 = req23 - req2
+                        for t2 in base_enum(size2, req2, allowed_ops-req3):
+                            for t3 in base_enum(
+                                    size3, req3, allowed_ops | set('yz')):
+                                yield (FOLD, t1, t2, (LAMBDA, ('y', 'z'), t3))
 
 
-def enum_if0(size, allowed_ops):
-    for s1 in range(1, size-2):
-        for pred in generate_distinct_predicates(s1, frozenset(allowed_ops)):
-            for s2 in range(1, size-1-s1):
-                for then in base_enum(s2, set(), allowed_ops):
-                    for else_ in base_enum(size-1-s1-s2, set(), allowed_ops):
-                        yield (IF0, pred, then, else_)
+def enum_if0(size, required_ops, allowed_ops):
+    for size1 in range(1, size):
+        size23 = size - 1 - size1
+        if size23 < 2:
+            continue
+        for req1 in frozen_powerset(required_ops):
+            req23 = required_ops - req1
+            if size_lower_bound(req23)+1 > size23:
+                # plus 1 because there are two terms
+                continue
+            for pred in generate_distinct_predicates(
+                size1, frozenset(req1), frozenset(allowed_ops-req23)):
+                for size2 in range(1, size):
+                    size3 = size23 - size2
+                    if size3 < 1:
+                        continue
+                    for req2 in frozen_powerset(req23):
+                        if size_lower_bound(req2) > size2:
+                            continue
+                        req3 = req23 - req2
+                        for then in base_enum(size2, req2, allowed_ops-req3):
+                            for else_ in base_enum(size3, req3, allowed_ops):
+                                yield (IF0, pred, then, else_)
 
 
 @cached
-def generate_distinct_predicates(size, allowed_ops):
-    logger.debug('generate distinct predicates {} {}'.format(size, allowed_ops))
+def generate_distinct_predicates(size, required_ops, allowed_ops):
+    logger.debug('generate distinct predicates {} {} {}'.format(size, required_ops, allowed_ops))
     predicates = []
-    for t in base_enum(size, set(), allowed_ops):
+    for t in base_enum(size, required_ops, allowed_ops):
         for p in predicates:
             if predicates_equivalent(p, t, in_fold_lambda='y' in allowed_ops):
                 break
@@ -109,7 +149,6 @@ def predicates_equivalent(t1, t2, in_fold_lambda=False):
 
     with PushPop():
         z3_solver.add((t1==0) != (t2==0))
-        #z3_solver.add(t1 != t2)
 
         result = z3_solver.check()
         if result == z3.unsat:
@@ -138,9 +177,9 @@ def enumerate_terms(size, operators):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
-    size = 6
+    size = 5
     cnt = 0
-    operators = set([IF0, NOT, SHL1])
+    operators = set([IF0, NOT])
 
     for t in enumerate_terms(size, operators):
         print term_to_str(t)
