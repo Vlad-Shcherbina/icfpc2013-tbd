@@ -1,6 +1,6 @@
 from terms import *
 from utils import cached, frozen_powerset
-from z3_utils import fresh_control
+from z3_utils import fresh_control, Control
 from distinct import filter_distinct
 
 import logging
@@ -112,8 +112,13 @@ def enum_fold(size, required_ops, allowed_ops, top_level, shapes=False):
                 # plus 1 because there are two terms
                 continue
             for t1 in base_enum(size1, req1, allowed_ops-req23, shapes=shapes):
-                if top_level and t1 != 'x':
-                    continue
+                if top_level:
+                    if isinstance(t1, Control):
+                        if 'x' not in t1.operations:
+                            continue
+                        t1 = 'x'
+                    if t1 != 'x':
+                        continue
                 for size2 in range(1, size23):
                     size3 = size23 - size2
                     if size3 < 1:
@@ -196,10 +201,12 @@ def enumerate_terms(size, operators, shapes=False):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
-    size = 10
-    cnt = 0
-    operators = set([IF0, NOT, AND, FOLD])
+    #size = 10
+    #operators = set([IF0, NOT, AND, FOLD])
+    size = 7
+    operators=frozenset(['tfold', 'or'])
 
+    cnt = 0
     for t in enumerate_terms(size, operators, shapes=True):
         print term_to_str(t)
         assert term_size(t) == size
