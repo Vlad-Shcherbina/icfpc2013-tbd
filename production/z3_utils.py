@@ -37,7 +37,10 @@ def fresh_var_name(prefix='fresh'):
 def fresh_control(operations):
     if len(operations) == 1:
         return operations[0]
-    return Control(z3.Int(fresh_var_name('control')), operations)
+    size = 1
+    while 2**size < len(operations):
+        size += 1
+    return Control(z3.BitVec(fresh_var_name('control'), size), operations)
 
 
 def inject_controls(t, control_map):
@@ -69,10 +72,20 @@ def instantiate_controls_from_model(term, model):
 
 
 def z3_switch(control, *options):
-    def recur(offset):
-        if offset == len(options) - 1: return options[offset]
-        return z3.If(control == offset, options[offset], recur(offset + 1))
-    return recur(0)
+    assert len(options) >= 2
+    def rec(lo, hi):
+        assert lo < hi
+        if hi == lo+1:
+            return options[lo]
+        if lo >= len(options)-1:
+            return options[-1]
+        else:
+            mid = (lo + hi) // 2
+            return z3.If(z3.ULT(control, mid), rec(lo, mid), rec(mid, hi))
+    hi = 1
+    while hi < len(options):
+        hi *= 2
+    return rec(0, hi)
 
 
 zero56 = z3.BitVecVal(0, 56)
@@ -175,16 +188,17 @@ class PushPop(object):
 
 
 if __name__ == '__main__':
-    t = ('b', 0, 'v')
+    t = ('b', 0, 1)
+    #t = 'v'
     print t
-    t, controls = inject_controls(t, {'v': [0, 1],'b': [PLUS, OR]})
+    t, controls = inject_controls(t, {'v': [0, 1], 'b': [PLUS, OR, AND]})
     print t
     print 'with controls', controls
     z3t = term_to_z3(t)
     print z3t
 
     z3_solver.add(controls[0].z3var == 0)
-    z3_solver.add(controls[1].z3var == 1)
+    #z3_solver.add(controls[1].z3var == 1)
     result = z3_solver.check()
     assert result == z3.sat
     model = z3_solver.model()
