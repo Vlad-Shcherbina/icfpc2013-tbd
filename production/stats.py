@@ -2,8 +2,20 @@ import logging
 logger = logging.getLogger('stats')
 
 from math import sqrt
+import time
 
 from collections import defaultdict, Counter
+
+
+times = defaultdict(float)
+
+class TimeIt(object):
+    def __init__(self, name):
+        self.name = name
+    def __enter__(self):
+        times[self.name] -= time.clock()
+    def __exit__(self, *args):
+        times[self.name] += time.clock()
 
 
 stats = defaultdict(list)
@@ -41,6 +53,8 @@ def log_stats():
     logger.info('-'*20)
     for k, v in sorted(stats.items()):
         logger.info('{}: {}'.format(k, list_stats_to_str(v)))
+    for k, v in sorted(times.items()):
+        logger.info('{}: {:.2f}s'.format(k, v))
     logger.info('-'*20)
 
 
