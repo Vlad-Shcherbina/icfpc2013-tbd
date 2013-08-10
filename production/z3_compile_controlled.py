@@ -65,7 +65,6 @@ def term_to_z3_controlled(t, vars, controls):
             decoder = lambda model: (IF0, arg1decoder(model), arg2decoder(model), arg3decoder(model))
             return z3term, decoder
         elif op == FOLD:
-            assert False, 'Not implemented, lol'
             bytes, bytesdecoder = term_to_z3_controlled(t[1], vars, controls)
             accum, accumdecoder = term_to_z3_controlled(t[2], vars, controls)
             _, (formal_y, formal_z), body = t[3]
