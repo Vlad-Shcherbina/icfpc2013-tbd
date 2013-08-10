@@ -119,7 +119,7 @@ def enum_fold(size, required_ops, allowed_ops, top_level, shapes=False):
                         t1 = 'x'
                     if t1 != 'x':
                         continue
-                for size2 in range(1, size23):
+                for size2 in reversed(range(1, size23)):  # favor smaller size3
                     size3 = size23 - size2
                     if size3 < 1:
                         continue
