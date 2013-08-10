@@ -163,11 +163,17 @@ def enum_if0(size, required_ops, allowed_ops, shapes=False):
 
 def enum_predicates(size, required_ops, allowed_ops, shapes=False):
     # TODO: fix code duplicatoin
-    if not shapes:
-        return generate_distinct_predicates(
-            size, frozenset(required_ops), frozenset(allowed_ops))
-    else:
+    if shapes:
+        assert len(required_ops) == 0
+    if shapes and size > 4:
         return base_enum(size, required_ops, allowed_ops, shapes=shapes)
+    distinct = generate_distinct_predicates(
+        size, frozenset(required_ops), frozenset(allowed_ops))
+    if shapes:
+        return [fresh_control(distinct)]
+    else:
+        return distinct
+
 
 
 @cached
@@ -201,14 +207,14 @@ def enumerate_terms(size, operators, shapes=False):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
-    #size = 10
-    #operators = set([IF0, NOT, AND, FOLD])
-    size = 7
-    operators=frozenset(['tfold', 'or'])
+    size = 10
+    operators = set([IF0, NOT, SHL1, AND, OR, FOLD])
+    #size = 7
+    #operators=frozenset(['tfold', 'or', 'if0'])
 
     cnt = 0
     for t in enumerate_terms(size, operators, shapes=True):
-        print term_to_str(t)
+        #print term_to_str(t)
         assert term_size(t) == size
         #assert term_op(t) == operators
         cnt += 1
