@@ -30,13 +30,13 @@ def random_interesting_number():
 class Solver(object):
     @classmethod
     def supported_sizes(cls):
-        return range(3, 11+1)
+        return range(10, 10+1)
 
     @classmethod
     def is_applicable(cls, problem):
         if problem.size not in cls.supported_sizes():
             return False
-        if 'if0' in problem.operators:
+        if 'if0' not in problem.operators:
             return False
         return True
 

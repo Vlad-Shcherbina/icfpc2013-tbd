@@ -32,7 +32,7 @@ def train(solver):
         else:
             logger.info('dunno how to solve')
 
-        time.sleep(10)
+        #time.sleep(10)
 
 
 def actually_fucking_solve(solver):
@@ -65,8 +65,8 @@ def actually_fucking_solve(solver):
     print 'DO NOT TERMINATE EXCEPT ON THE "waiting" MESSAGE!!!'
 
     for problem in problems:
-        print 'waiting 20s...'
-        time.sleep(20)  # sleep to clear any resource window for sure
+        print 'waiting 10s...'
+        time.sleep(10)  # sleep to clear any resource window for sure
 
         #print 'do you think it\'s a good idea to try to solve'
         #print problem
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     #print get_status()
     #time.sleep(5)
 
-    #train(solver)
+    train(solver)
 
-    actually_fucking_solve(solver)
+    #actually_fucking_solve(solver)
 
