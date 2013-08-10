@@ -40,7 +40,7 @@ def actually_fucking_solve(solver):
         p for p in problems if p.solved is None and solver.is_applicable(p)]
 
     # To ensure that in case of failure we return to the same problem.
-    problems.sort(key=lambda p: (p.kind(), p.id))
+    problems.sort(key=lambda p: (p.kind(), len(p.operators), p.id))
 
     logger.info(
         'following {} problems look amenable to {}'
@@ -115,7 +115,7 @@ if __name__ == '__main__':
     #print get_status()
     #time.sleep(5)
 
-    train(solver)
+    #train(solver)
 
-    #actually_fucking_solve(solver)
+    actually_fucking_solve(solver)
 
