@@ -1,6 +1,6 @@
 from pprint import pprint
 from collections import Counter
-from communicate import Problem 
+from communicate import Problem, send
 import json, pickle, re
 import os
 from os import path as os_path
@@ -17,12 +17,19 @@ def is_actual_problem(problem_id):
     assert _id_rx.match(problem_id), problem_id
     
     def sanity_check(ids):
-        assert len(ids) == 1420 + 200
+        assert len(ids) == 1420 + 200 + 200
         assert all(_id_rx.match(id) for id in ids)
         
     if _cached_problem_ids is None:
+        if not os_path.exists(MYPROBLEMS_FILE):
+            # regenerate problems file
+            r = send('myproblems')
+            with open(MYPROBLEMS_FILE, 'wb') as f:
+                json.dump(r, f, indent = 4)
+            
         if (not os_path.exists(CACHED_PROBLEM_IDS_FILE) or
             os_path.getmtime(CACHED_PROBLEM_IDS_FILE) < os_path.getmtime(MYPROBLEMS_FILE)):
+            # regenerate CACHED_PROBLEM_IDS_FILE
             problems = load_problems()
             ids = frozenset(problem.id for problem in problems)
             sanity_check(ids)

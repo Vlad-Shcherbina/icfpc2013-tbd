@@ -1,1 +1,3 @@
 auth_token.txt
+unique_preds.pickle
+unique_terms.pickle
