@@ -41,6 +41,13 @@ Y = z3.BitVec('y', 64)
 Z = z3.BitVec('z', 64)
 
 
+def nice_term_to_z3(t):
+    if FOLD in repr(t):
+        return term_to_z3(t, dict(x=X))
+    else:
+        return term_to_z3(t, dict(x=X, y=Y, z=Z))
+    pass
+
 def filter_distinct(terms, as_predicates=False):
     buckets = defaultdict(list)
 
@@ -52,11 +59,8 @@ def filter_distinct(terms, as_predicates=False):
     for t in terms:
         signature = predicate_signature(t)
 
-        if FOLD in repr(t):
-            zt = term_to_z3(t, dict(x=X))
-        else:
-            zt = term_to_z3(t, dict(x=X, y=Y, z=Z))
 
+        zt = nice_term_to_z3(t)
         zt = z3.simplify(zt)
 
         for zz in buckets[signature]:

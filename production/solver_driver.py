@@ -20,7 +20,7 @@ def train(server, solver):
     while True:
         problem = server.get_problem()
         if problem is None:
-            logger.info('No more problems to solve') 
+            logger.info('No more problems to solve')
             break
         logger.info('----------- trying problem {} ------------'.format(problem))
 
@@ -92,15 +92,16 @@ def setup_dual_logging():
 
 
 if __name__ == '__main__':
+    import real_server
+    from communicate import get_training_problem_iter
+
     setup_dual_logging()
 
     solver = brute_force_solver.Solver()
     #solver = shape_solver.Solver()
 
-    #print get_status()
-    #time.sleep(5)
+    server = real_server.Server(get_training_problem_iter(size=8))
+    train(server, solver)
 
-    #train(solver)
-
-    actually_fucking_solve(solver)
+    #actually_fucking_solve(server, solver)
 
