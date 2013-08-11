@@ -86,7 +86,7 @@ def get_real_problems_to_solve(sizes, operator_predicate=None):
         sizes = (sizes,)
     problems = [
             p for p in problems
-            if not p.solved
+            if p.solved is None
             and p.size in sizes
             and (operator_predicate is None or operator_predicate(p))]
     return problems
