@@ -42,8 +42,6 @@ Z = z3.BitVec('z', 64)
 
 
 def filter_distinct(terms, as_predicates=False):
-    predicates = []
-
     buckets = defaultdict(list)
 
     if as_predicates:
@@ -65,10 +63,8 @@ def filter_distinct(terms, as_predicates=False):
             if terms_equivalent(zz, zt, as_predicates=as_predicates):
                 break
         else:
-            predicates.append(t)
             buckets[signature].append(zt)
-
-    return predicates
+            yield t
 
 
 def terms_equivalent(t1, t2, as_predicates=False):
@@ -107,12 +103,12 @@ if __name__ == '__main__':
         terms = list(base_enum(size, required_ops, allowed_ops))
     print len(terms), 'terms'
 
-    preds = filter_distinct(terms, as_predicates=True)
+    preds = list(filter_distinct(terms, as_predicates=True))
     print len(preds), 'distinct predicates'
     for pred in preds:
         print pred
 
-    terms = filter_distinct(terms)
+    terms = list(filter_distinct(terms))
     print len(terms), 'distinct terms'
     for term in terms:
         print term

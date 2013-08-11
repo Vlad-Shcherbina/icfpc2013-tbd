@@ -191,7 +191,7 @@ def enum_predicates(size, required_ops, allowed_ops, shapes=False):
 @cached
 def generate_distinct_terms(size, required_ops, allowed_ops):
     logger.debug('generate distinct terms {} {} {}'.format(size, required_ops, allowed_ops))
-    predicates = filter_distinct(base_enum_impl(size, required_ops, allowed_ops), as_predicates=False)
+    predicates = list(filter_distinct(base_enum_impl(size, required_ops, allowed_ops), as_predicates=False))
     logger.debug('{} terms'.format(len(predicates)))
     return predicates
 
@@ -199,7 +199,7 @@ def generate_distinct_terms(size, required_ops, allowed_ops):
 @cached
 def generate_distinct_predicates(size, required_ops, allowed_ops):
     logger.debug('generate distinct predicates {} {} {}'.format(size, required_ops, allowed_ops))
-    predicates = filter_distinct(base_enum(size, required_ops, allowed_ops), as_predicates=True)
+    predicates = list(filter_distinct(base_enum(size, required_ops, allowed_ops), as_predicates=True))
     logger.debug('{} predicates'.format(len(predicates)))
     return predicates
 
