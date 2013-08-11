@@ -7,7 +7,7 @@ from random import randrange
 import itertools
 
 from terms import *
-from enum_terms import enumerate_terms
+from simple_enum import top_level_enum
 import stats
 import attach
 
@@ -61,7 +61,7 @@ class Solver(object):
                     yield candidate
 
         candidates = itertools.chain(
-            *(enumerate_terms(size, problem.operators) for size in range(1, problem.size)))
+            *(top_level_enum(size, problem.operators) for size in range(1, problem.size)))
         candidates = filter_candidates(candidates)
 
         return basic_solver_loop(server, problem, candidates, logger)
