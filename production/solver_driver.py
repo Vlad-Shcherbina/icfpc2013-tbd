@@ -24,8 +24,12 @@ def train(server, solver):
             break
         logger.info('----------- trying problem {} ------------'.format(problem))
 
-        solver.solve(server, problem)
-        stats.add_value('solved', 0)
+        try:
+            solver.solve(server, problem)
+            stats.add_value('solved', 0)
+        except brute_force_solver.TimeoutError:
+            logger.error('TIMEOUT!!!!!!!!!!!!!!!')
+            stats.add_value('timeouts', 0)
         stats.log_stats()
 
 
@@ -65,9 +69,13 @@ def actually_fucking_solve(server, solver):
 
         logger.info('solving {}'.format(problem))
         logger.info('using {}'.format(solver))
-        solution = solver.solve(server, problem)
 
-        add_solved_problem(problem.id, False, problem.size, problem.operators, solution)
+        try:
+            solution = solver.solve(server, problem)
+            add_solved_problem(problem.id, False, problem.size, problem.operators, solution)
+        except brute_force_solver.TimeoutError:
+            logger.error('TIMEOUT!!!!!!!!!!!!!!!')
+            stats.add_value('timeouts', 0)
 
         stats.add_value('solved', 0)
         stats.log_stats()
@@ -100,14 +108,17 @@ if __name__ == '__main__':
     solver = brute_force_solver.Solver()
     #solver = shape_solver.Solver()
 
-    server = real_server.Server(get_training_problem_iter(size=42))
-    train(server, solver)
+    #server = real_server.Server(get_training_problem_iter(size=12))
+    #train(server, solver)
 
-    exit()
+    #exit()
+
     def filter(p):
+        if hash(p.id)%2 != 0:  # fj takes the other half
+            return False
         if 'tfold' in p.operators:
-            return True
-        if 'fold' in p.operators:
+            return False
+        if 'fold' not in p.operators:
             return False
         return True
     server= real_server.Server(get_real_problems_to_solve(13, filter), training=False)
