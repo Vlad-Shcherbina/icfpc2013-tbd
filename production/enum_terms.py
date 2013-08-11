@@ -2,6 +2,7 @@ from terms import *
 from utils import cached, frozen_powerset
 from z3_utils import fresh_control, Control
 from distinct import filter_distinct
+import attach
 
 import logging
 logger = logging.getLogger('enum')
@@ -83,9 +84,11 @@ def base_enum_impl(size, required_ops, allowed_ops, shapes=False):
             assert False, op
 
 
+att = attach.TupleWithValues.create
+
 def enum_unary(op, size, required_ops, allowed_ops, shapes=False):
     for t in base_enum(size-1, required_ops, allowed_ops, shapes=shapes):
-       yield (op, t)
+       yield att((op, t))
 
 
 def enum_binary(op, size, required_ops, allowed_ops, shapes=False):
@@ -102,7 +105,7 @@ def enum_binary(op, size, required_ops, allowed_ops, shapes=False):
                     # TODO: commutativity cutoff for shapes
                     if not shapes and t2 > t1:
                         continue
-                    yield (op, t1, t2)
+                    yield att((op, t1, t2))
 
 
 def enum_fold(size, required_ops, allowed_ops, top_level, shapes=False):
@@ -139,7 +142,7 @@ def enum_fold(size, required_ops, allowed_ops, top_level, shapes=False):
                         for t2 in base_enum(size2, req2, allowed_ops-req3, shapes=shapes):
                             for t3 in base_enum(
                                     size3, req3, allowed_ops | set('yz'), shapes=shapes):
-                                yield (FOLD, t1, t2, (LAMBDA, ('y', 'z'), t3))
+                                yield att((FOLD, t1, t2, (LAMBDA, ('y', 'z'), t3)))
 
 
 def enum_if0(size, required_ops, allowed_ops, shapes=False):
@@ -167,7 +170,7 @@ def enum_if0(size, required_ops, allowed_ops, shapes=False):
                             continue
                         for then in base_enum(size2, req2, allowed_ops-req3, shapes=shapes):
                             for else_ in base_enum(size3, req3, allowed_ops, shapes=shapes):
-                                yield (IF0, pred, then, else_)
+                                yield att((IF0, pred, then, else_))
 
 
 def enum_predicates(size, required_ops, allowed_ops, shapes=False):

@@ -10,10 +10,12 @@ from terms import *
 from communicate import Problem, get_training_problem
 from enum_terms import enumerate_terms
 import stats
+import attach
 
 
 NUMBERS_TO_TEST = [0] + [1 << i for i in [1, 2, 3, 4, 5, 15, 16, 31, 32, 63]]
 NUMBERS_TO_TEST.extend([MASK ^ i for i in NUMBERS_TO_TEST])
+NUMBERS_TO_TEST.extend(attach.POINTS)
 
 
 def random_interesting_number():
@@ -50,7 +52,15 @@ class Solver(object):
         def filter_candidates(candidates):
             num_tries = 0
             for candidate in candidates:
+                fits = True
+                for k, v in attach.get_attached_values(candidate).items():
+                    if problem.values[k] != v:
+                        fits = False
+                        break
+                if not fits:
+                    continue
                 num_tries += 1
+
                 with stats.TimeIt('eval candidate'):
                     fits = True
                     cnt = 0
