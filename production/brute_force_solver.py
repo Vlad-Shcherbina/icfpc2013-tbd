@@ -64,6 +64,7 @@ class Solver(object):
         ops = problem.operators & unique_db.DB_OPS
         if 'fold' in problem.operators or 'tfold' in problem.operators:
             ops |= frozenset('yz')
+            warmup_unique_db(min(3, problem.size-1), ops | frozenset('yz'))
         warmup_unique_db(min(4, problem.size-1), ops)
 
         candidates = itertools.chain(

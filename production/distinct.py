@@ -1,4 +1,5 @@
 from collections import defaultdict
+import logging
 
 from terms import *
 
@@ -86,7 +87,9 @@ def terms_equivalent(t1, t2, as_predicates=False):
         elif result == z3.sat:
             return False
         else:
-            assert False, result
+            logging.warning('z3 timeout on ({}, {})'.format(t1, t2))
+            return False
+            #assert False, result
 
 
 if __name__ == '__main__':

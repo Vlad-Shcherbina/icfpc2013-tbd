@@ -1,6 +1,8 @@
 import json
 from collections import defaultdict
 import itertools
+import pickle
+import os
 
 from utils import cached
 from terms import *
@@ -14,7 +16,7 @@ DB_OPS = frozenset(['y', 'z', IF0] + UNARY_OPS + BINARY_OPS)
 
 
 class Constraint(object):
-    __slots__ = ['size', 'ops']
+    # __slots__ = ['size', 'ops']
     def __init__(self, size, ops):
         assert size >= 0
         assert isinstance(ops, frozenset)
@@ -58,12 +60,12 @@ def remove_implying_constraints(cs):
 
 
 class FunctionInfo(object):
-    __slots__ = [
-        'minimal_implementation',
-        'z3term',
-        'signature',  # semantic hash for comparison
-        'possible_in',  # list of constraints
-        ]
+    # __slots__ = [
+    #     'minimal_implementation',
+    #     'z3term',
+    #     'signature',  # semantic hash for comparison
+    #     'possible_in',  # list of constraints
+    #     ]
     def __init__(self, minimal_implementation, signature, z3term):
         self.minimal_implementation = minimal_implementation
         self.signature = signature
@@ -82,16 +84,18 @@ class FunctionInfo(object):
 
 
 class UniqueDB(object):
-    __slots__ = [
-        'complete_for',  # list of constraints
-        'buckets',  # {signature: [function, ...], ...}
-        'by_impl',  # {minimal_implementation: function}
+    # __slots__ = [
+    #     'type',  # 'terms' or 'preds'
+    #     'complete_for',  # list of constraints
+    #     'buckets',  # {signature: [function, ...], ...}
+    #     'by_impl',  # {minimal_implementation: function}
 
-        'signature_computer',
-        'term_to_z3',
-        'z3comparer',
-    ]
-    def __init__(self):
+    #     'signature_computer',
+    #     'term_to_z3',
+    #     'z3comparer',
+    # ]
+    def __init__(self, type):
+        self.type = type
         self.complete_for = []
         self.buckets = defaultdict(list)
         self.by_impl = {}
@@ -100,13 +104,39 @@ class UniqueDB(object):
         self.signature_computer = signature_computer
         self.term_to_z3 = term_to_z3
         self.z3comparer = z3comparer
-        # TODO: update z3 terms of all existing functions
+        for fn in self.iter_functions():
+            fn.z3term = term_to_z3(fn.minimal_implementation)
 
-    def remove_comparer(self):
+    def clear_unpicklable_stuff(self):
         self.signature_computer = None
         self.term_to_z3 = None
         self.z3comparer = None
-        # TODO: remove z3 terms from all existing functions for serialization
+        for fn in self.iter_functions():
+            fn.z3term = None
+
+    @staticmethod
+    def filename(type):
+        return '../data/unique_{}.pickle'.format(type)
+
+    def save_and_destroy(self):
+        self.clear_unpicklable_stuff()
+        for fn in self.iter_functions():
+            fn.minimal_implementation = term_to_str(fn.minimal_implementation)
+
+        with open(UniqueDB.filename(self.type), 'w') as fout:
+            pickle.dump(self, fout)
+        logger.info('{} saved and destroyed'.format(self.type))
+
+        get_unique_db.clear_cache()
+
+    @staticmethod
+    def load(type):
+        with open(UniqueDB.filename(type)) as fin:
+            logger.info('loading {} db'.format(type))
+            result = pickle.load(fin)
+            for fn in result.iter_functions():
+                fn.minimal_implementation = parse_any_term(fn.minimal_implementation)
+            return result
 
     def is_complete_for(self, constraint):
         if constraint.size == 0:
@@ -127,6 +157,10 @@ class UniqueDB(object):
                 yield fn.minimal_implementation
 
     def get_where_term_is_possible_in(self, term):
+        if self.type == 'preds':
+            self = get_unique_db('terms')
+            # because parts of preds are terms, not preds
+
         #assert term not in self.by_impl
         if term in [0, 1, 'x', 'y', 'z']:
             return [Constraint(1, frozenset([term]) & DB_OPS)]
@@ -142,7 +176,7 @@ class UniqueDB(object):
 
 
     def complete(self, constraint, all_terms):
-        logger.info('completing db for {}'.format(constraint))
+        logger.info('completing {}_db for {}'.format(self.type, constraint))
         assert self.is_complete_for(Constraint(constraint.size-1, constraint.ops))
         # it is expected that immediate subterms are
         # canonical minimal implementations
@@ -159,9 +193,9 @@ class UniqueDB(object):
             for fn in bucket:
                 if self.z3comparer(fn.z3term, z3term):
                     if term_size(term) < term_size(fn.minimal_implementation):
-                        logger.debug(
-                            'replacing minimal impl {} with {}'
-                            .format(fn.minimal_implementation, term))
+                        #logger.debug(
+                        #    'replacing minimal impl {} with {}'
+                        #    .format(fn.minimal_implementation, term))
                         del self.by_impl[fn.minimal_implementation]
                         fn.minimal_implementation = term
                         fn.z3term = z3term  # because it's probably shorter
@@ -179,11 +213,10 @@ class UniqueDB(object):
         self.complete_for = remove_implying_constraints(self.complete_for)
 
         num_entries = sum(1 for f in self.iter_functions())
-        logger.info('db for {} is complete '.format(constraint))
+        logger.info('{}_db for {} is complete '.format(self.type, constraint))
         logger.info('({} entries)'.format(num_entries))
 
     def show(self):
-        print repr(self)
         print 'db complete for', self.complete_for
         print 'functions:'
         for fn in self.iter_functions():
@@ -194,35 +227,32 @@ class UniqueDB(object):
 
 # signleton
 @cached
-def get_unique_db():
+def get_unique_db(type):
+    assert type in ['terms', 'preds']
     # TODO
-    db = UniqueDB()
 
-    db.set_comparer(
-        distinct.term_signature,
-        distinct.nice_term_to_z3,
-        lambda zt1, zt2: distinct.terms_equivalent(zt1, zt2, as_predicates=False))
+    if os.path.exists(UniqueDB.filename(type)):
+        db = UniqueDB.load(type)
+    else:
+        db = UniqueDB(type)
+
+    if type == 'terms':
+        db.set_comparer(
+            distinct.term_signature,
+            distinct.nice_term_to_z3,
+            lambda zt1, zt2: distinct.terms_equivalent(zt1, zt2, as_predicates=False))
+    elif type == 'preds':
+        db.set_comparer(
+            distinct.predicate_signature,
+            distinct.nice_term_to_z3,
+            lambda zt1, zt2: distinct.terms_equivalent(zt1, zt2, as_predicates=True))
+    else:
+        assert False
+
     return db
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
-    db = get_unique_db()
-
-
+    db = get_unique_db('terms')
     db.show()
-
-    db.complete(Constraint(1, DB_OPS), [0, 1, 'x', 'y', 'z'])
-
-    db.show()
-
-    db.complete(Constraint(2, frozenset([SHR1])), [(SHR1, 0), (SHR1, 1), (SHR1, 'x'), (SHR1, 'y')])
-
-    db.show()
-
-
-    exit()
-    c1 = Constraint(4, frozenset())
-    c2 = Constraint(2, frozenset([IF0]))
-    print c1
-    print c1.implies(c2), c2.implies(c1)

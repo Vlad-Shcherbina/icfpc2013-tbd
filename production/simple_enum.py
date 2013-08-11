@@ -1,3 +1,6 @@
+import time
+import gc
+
 from terms import *
 from utils import cached
 #from z3_utils import fresh_control, Control
@@ -5,9 +8,19 @@ from distinct import filter_distinct
 import attach
 import unique_db
 import stats
+import z3_utils
 
 import logging
 logger = logging.getLogger('enum')
+
+
+@cached
+def list_unique(type, size, allowed_ops):
+    db = unique_db.get_unique_db(type)
+    if db.is_complete_for(unique_db.Constraint(size, allowed_ops)):
+        return map(attach.eval_and_attach, db.get_unique_terms(size, allowed_ops))
+    else:
+        return None
 
 
 def base_enum(size, allowed_ops, fold=False):
@@ -15,13 +28,9 @@ def base_enum(size, allowed_ops, fold=False):
         return
 
     if not fold:
-        db = unique_db.get_unique_db()
-        if db.is_complete_for(unique_db.Constraint(size, allowed_ops)):
-            ts = db.get_unique_terms(size, allowed_ops)
-            ts = list(ts)
-            #db.show()
-            #print 'cached unique', size, allowed_ops, ts
-            for t in ts:
+        u = list_unique('terms', size, allowed_ops)
+        if u is not None:
+            for t in u:
                 yield t
             return
 
@@ -110,12 +119,12 @@ def enum_preds(size, allowed_ops, fold=False):
     if size < 1:
         return
 
-    # res = unique.get_unique(
-    #     size, 'preds', allowed_ops | (frozenset(['fold']) if fold else frozenset()))
-    # if res is not None:
-    #     for t in res:
-    #         yield t
-    #     return
+    if not fold:
+        u = list_unique('preds', size, allowed_ops)
+        if u is not None:
+            for t in u:
+                yield t
+            return
 
     for t in base_enum(size, allowed_ops, fold=fold):
         yield t
@@ -131,14 +140,33 @@ def top_level_enum(size, operators):
 
 
 def populate_unique_db(size, ops):
-    db = unique_db.get_unique_db()
-    c = unique_db.Constraint(size, ops)
-    if db.is_complete_for(c):
-        return
-    #terms = list(base_enum(size, ops))
-    #print 'terms to complete', map(term_to_str, terms)
-    terms = base_enum(size, ops)
-    db.complete(c, terms)
+    for type in 'terms', 'preds':
+        db = unique_db.get_unique_db(type)
+        c = unique_db.Constraint(size, ops)
+        if db.is_complete_for(c):
+            continue
+
+        terms = base_enum(size, ops)
+
+        def progress_generator(xs):
+            xs = list(xs)
+            #print 'list created'
+            start = time.clock()
+            time_to_report = start + 5
+            for i, x in enumerate(xs):
+                if (i+1) % 5 == 0 and time.clock() > time_to_report:
+                    remaining = (time.clock() - start) * (len(xs)-i) / i
+                    logger.info(
+                        'progress {}% ({}/{}) (approx {:.1f}s remaining)'
+                        .format(100*i/len(xs), i, len(xs), remaining))
+                    time_to_report = time.clock() + 5
+                    gc.collect()
+                    z3_utils.z3_solver.reset()
+                yield x
+
+        db.complete(c, progress_generator(terms))
+        list_unique.clear_cache()
+        db.save_and_destroy()
 
 
 def warmup_unique_db(size, ops):
@@ -152,25 +180,4 @@ if __name__ == '__main__':
     import logging
     logging.basicConfig(level=logging.INFO)
 
-    db = unique_db.get_unique_db()
-
-    warmup_unique_db(6, frozenset([PLUS, NOT, OR, AND, SHL1, SHR1]))
-    #warmup_unique_db(1, frozenset())
-    #db.show()
-
-    #warmup_unique_db(3, frozenset([PLUS]))
-    #db.show()
-
-
-    #print list(db.get_unique_terms(2, frozenset([SHL1])))
-    #print list(db.get_unique_terms(1, frozenset([SHL1])))
-
-    #exit()
-    #warmup_unique_db(2, frozenset([SHL1]))
-    #db.show()
-
-    #ops = frozenset([IF0, 'tfold'])
-
-    #for t in top_level_enum(8, ops):
-    #    print term_to_str(t)
-
+    warmup_unique_db(5, unique_db.DB_OPS)

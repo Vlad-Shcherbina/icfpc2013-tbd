@@ -178,6 +178,7 @@ def z3_eval_term(t, context={}):
 
 
 z3_solver = z3.Solver()
+z3_solver.set(timeout=250)
 
 
 class PushPop(object):
@@ -188,6 +189,9 @@ class PushPop(object):
 
 
 if __name__ == '__main__':
+    print dir(z3_solver)
+    #print help(z3_solver.reset)
+    exit()
     t = ('b', 0, 1)
     #t = 'v'
     print t
