@@ -209,6 +209,7 @@ def enumerate_terms(size, operators, shapes=False):
             required_ops = set()
         else:
             required_ops = ops
+        required_ops = set()
         return enum_fold(size, required_ops, set([0, 1, 'x']) | ops, top_level=True, shapes=shapes)
 
     if 'fold' in operators:
@@ -218,6 +219,7 @@ def enumerate_terms(size, operators, shapes=False):
         required_ops = set()
     else:
         required_ops = ops
+    required_ops = set()
     return base_enum(size, required_ops, set([0, 1, 'x']) | ops, shapes=shapes)
 
 

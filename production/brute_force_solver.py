@@ -31,7 +31,7 @@ def random_interesting_number():
 class Solver(object):
     @classmethod
     def supported_sizes(cls):
-        return range(12, 12+1)
+        return range(13, 13+1)
 
     @classmethod
     def is_applicable(cls, problem):
@@ -68,7 +68,8 @@ class Solver(object):
                         problem.kind()+'_tries_to_find_candidate', num_tries)
                     yield candidate
 
-        candidates = enumerate_terms(problem.size-1, problem.operators)
+        candidates = itertools.chain(
+            *(enumerate_terms(size, problem.operators) for size in range(1, problem.size)))
         candidates = filter_candidates(candidates)
 
         return basic_solver_loop(problem, candidates, logger)
@@ -105,6 +106,10 @@ def basic_solver_loop(problem, candidates, logger):
             logger.info('solved!')
             stats.add_value(problem.kind()+'_time', time.time()-start)
             stats.add_value(problem.kind()+'_attempts', attempts)
+
+            size = term_size(program)
+            stats.add_value('size_change_{}_{}'.format(problem.size, size), 1)
+
             return term_to_str(program)
 
         logger.warning('wrong guess')
