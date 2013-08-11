@@ -89,11 +89,13 @@ def print_problem_statistics():
         print_count_of_problems_p('tfold !bonus', problems) 
         print_count_of_problems_p('fold !bonus', problems) 
         print_count_of_problems_p('if0 !fold !tfold !bonus', problems)
-        print_count_of_problems_p('!if0 !fold !tfold !bonus', problems)
+        # these are all solved, no point in tracking
+#        print_count_of_problems_p('!if0 !fold !tfold !bonus', problems)
         print_count_of_problems_p('bonus', problems)
     
     solved = [p for p in problems if p.solved]
-    remaining = [p for p in problems if not p.solved]
+    remaining = [p for p in problems if p.solved is None]
+    failed = [p for p in problems if p.solved is False]
     print 'Total =', len(problems)
     print 
     print '---------- Solved:', len(solved)
@@ -102,11 +104,14 @@ def print_problem_statistics():
     print '---------- Remaining:', len(remaining)
     print_categories(remaining)
     print
+    print '---------- Failed:', len(failed)
+    print_categories(failed)
+    print
     
 
 def main():
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
-#    update_myproblems_file()
+    update_myproblems_file()
     print_problem_statistics()
 
 if __name__ == '__main__':
