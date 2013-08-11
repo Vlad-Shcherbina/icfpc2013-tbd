@@ -80,19 +80,19 @@ def get_real_problems():
     return map(Problem.from_json, r)
 
 
-def get_real_fucking_problems_to_solve(sizes, operator_predicate):
+def get_real_problems_to_solve(sizes, operator_predicate=None):
     problems = get_real_problems()
     if isinstance(sizes, int):
         sizes = (sizes,)
     problems = [
             p for p in problems
             if not p.solved
-            and p.size in sizes 
-            and operator_predicate is None or operator_predicate(p)]
-    return problems  
-    
-    
-    
+            and p.size in sizes
+            and (operator_predicate is None or operator_predicate(p))]
+    return problems
+
+
+
 if __name__ == '__main__':
     #logging.basicConfig(level=logging.DEBUG)
 
