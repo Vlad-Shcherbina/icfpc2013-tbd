@@ -100,7 +100,7 @@ if __name__ == '__main__':
     solver = brute_force_solver.Solver()
     #solver = shape_solver.Solver()
 
-    server = real_server.Server(get_training_problem_iter(size=8))
+    server = real_server.Server(get_training_problem_iter(size=12))
     train(server, solver)
 
     #actually_fucking_solve(server, solver)

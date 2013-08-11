@@ -3,7 +3,8 @@ from utils import cached
 #from z3_utils import fresh_control, Control
 from distinct import filter_distinct
 import attach
-import unique
+import unique_db
+import stats
 
 import logging
 logger = logging.getLogger('enum')
@@ -13,12 +14,16 @@ def base_enum(size, allowed_ops, fold=False):
     if size < 1:
         return
 
-    # res = unique.get_unique(
-    #     size, 'terms', allowed_ops | (frozenset(['fold']) if fold else frozenset()))
-    # if res is not None:
-    #     for t in res:
-    #         yield t
-    #     return
+    if not fold:
+        db = unique_db.get_unique_db()
+        if db.is_complete_for(unique_db.Constraint(size, allowed_ops)):
+            ts = db.get_unique_terms(size, allowed_ops)
+            ts = list(ts)
+            #db.show()
+            #print 'cached unique', size, allowed_ops, ts
+            for t in ts:
+                yield t
+            return
 
     if fold and size < 5:
         return
@@ -122,15 +127,50 @@ def top_level_enum(size, operators):
     if 'tfold' in operators:
         return enum_fold(size, ops, top_level=True)
 
-    if 'fold' in operators:
-        ops.add('fold')
+    return base_enum(size, ops, fold=('fold' in operators))
 
-    return base_enum(size, ops)
+
+def populate_unique_db(size, ops):
+    db = unique_db.get_unique_db()
+    c = unique_db.Constraint(size, ops)
+    if db.is_complete_for(c):
+        return
+    #terms = list(base_enum(size, ops))
+    #print 'terms to complete', map(term_to_str, terms)
+    terms = base_enum(size, ops)
+    db.complete(c, terms)
+
+
+def warmup_unique_db(size, ops):
+    with stats.TimeIt('warming up unique db'):
+        populate_unique_db(1, frozenset())
+        for i in range(1, size+1):
+            populate_unique_db(i, ops)
 
 
 if __name__ == '__main__':
-    ops = frozenset([IF0, 'tfold'])
+    import logging
+    logging.basicConfig(level=logging.INFO)
 
-    for t in top_level_enum(8, ops):
-        print term_to_str(t)
+    db = unique_db.get_unique_db()
+
+    warmup_unique_db(6, frozenset([PLUS, NOT, OR, AND, SHL1, SHR1]))
+    #warmup_unique_db(1, frozenset())
+    #db.show()
+
+    #warmup_unique_db(3, frozenset([PLUS]))
+    #db.show()
+
+
+    #print list(db.get_unique_terms(2, frozenset([SHL1])))
+    #print list(db.get_unique_terms(1, frozenset([SHL1])))
+
+    #exit()
+    #warmup_unique_db(2, frozenset([SHL1]))
+    #db.show()
+
+    #ops = frozenset([IF0, 'tfold'])
+
+    #for t in top_level_enum(8, ops):
+    #    print term_to_str(t)
 
