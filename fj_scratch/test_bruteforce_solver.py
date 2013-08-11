@@ -1,7 +1,11 @@
 import sys, logging
 logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
+
+# disable annoying loggers (globally, unfortunately :/ )
 logging.getLogger('unique_db').setLevel(logging.WARNING)
 logging.getLogger('stats').setLevel(logging.WARNING)
+logging.getLogger('solution_db').setLevel(logging.WARNING)
+logging.getLogger('communicate').setLevel(logging.WARNING)
 
 import solver_driver
 import brute_force_solver

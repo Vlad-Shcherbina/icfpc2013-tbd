@@ -22,7 +22,7 @@ class Server(object):
             
         
     def get_problem(self):
-        return next(self.problem_iter)
+        return next(self.problem_iter, None)
     
     def get_all_problems(self):
         return list(self.problem_iter)
