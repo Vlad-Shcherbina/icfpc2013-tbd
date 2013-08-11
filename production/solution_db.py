@@ -118,10 +118,9 @@ def get_problems(size = None, operators = None, training = None, limit = None):
 def main():
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
     log.info('Yo!')
-    get_training_problem()
-#    solutions = get_problems(training = True, limit = 20, operators = '(fold | tfold) & !if0')
-#    print '\n'.join('{}, {}: {}'.format(p.id, p.size, p.solution) for p in solutions)
-#    print len(solutions)
+    solutions = get_problems(operators = 'fold')
+    print '\n'.join('{}, {}: {}'.format(p.id, p.size, p.solution) for p in solutions)
+    print len(solutions)
     log.info('done')
 
 

@@ -4,12 +4,20 @@ from communicate import Problem, send
 import json, pickle, re
 import os
 from os import path as os_path
+import sys, logging 
 
 MYPROBLEMS_FILE = '../data/myproblems.json'
 CACHED_PROBLEM_IDS_FILE = '../data/cached_problem_ids.pickle'
 
 _cached_problem_ids = None
 _id_rx = re.compile(r'^[a-zA-Z0-9]{24}$')
+
+
+def update_myproblems_file():
+    r = send('myproblems')
+    with open(MYPROBLEMS_FILE, 'wb') as f:
+        json.dump(r, f, indent = 4)
+
 
 def is_actual_problem(problem_id):
     # This is a very paranoid function
@@ -23,9 +31,7 @@ def is_actual_problem(problem_id):
     if _cached_problem_ids is None:
         if not os_path.exists(MYPROBLEMS_FILE):
             # regenerate problems file
-            r = send('myproblems')
-            with open(MYPROBLEMS_FILE, 'wb') as f:
-                json.dump(r, f, indent = 4)
+            update_myproblems_file()
             
         if (not os_path.exists(CACHED_PROBLEM_IDS_FILE) or
             os_path.getmtime(CACHED_PROBLEM_IDS_FILE) < os_path.getmtime(MYPROBLEMS_FILE)):
@@ -57,28 +63,51 @@ def print_count_of_problems(name, problems, predicate):
     for p in problems:
         if predicate(p):
             counter[p.size] += 1
-    pprint(sorted(counter.iteritems()))
-    print
+    total = sum(v for _k, v in counter.iteritems())
+    print total, ':', ', '.join('{}:{}'.format(*kv) for kv in sorted(counter.iteritems()))
 
+def make_predicate(s):
+    conditions = s.split()
+    present, absent = [], []
+    for c in conditions:
+        if c.startswith('!'):
+            absent.append(c[1:])
+        else:
+            present.append(c)
+    return lambda p: (
+            all(c in p.operators for c in present) and 
+            all(c not in p.operators for c in absent))
 
 def print_problem_statistics():
-    problems = load_problems()
-
+    problems = load_problems() 
     assert not any('fold' in p.operators and 'tfold' in p.operators for p in problems)
+    
+    def print_count_of_problems_p(p, problems):
+        return print_count_of_problems(p, problems, make_predicate(p))
+
+    def print_categories(problems):
+        print_count_of_problems_p('tfold !bonus', problems) 
+        print_count_of_problems_p('fold !bonus', problems) 
+        print_count_of_problems_p('if0 !fold !tfold !bonus', problems)
+        print_count_of_problems_p('!if0 !fold !tfold !bonus', problems)
+        print_count_of_problems_p('bonus', problems)
+        
     print 'Total =', len(problems)
-    print_count_of_problems('has fold', problems, lambda p: 'fold' in p.operators) 
-    print_count_of_problems('has tfold', problems, lambda p: 'tfold' in p.operators) 
-    print_count_of_problems('no folds', problems, 
-        lambda p: not ('fold' in p.operators or 'tfold' in p.operators))
-    print_count_of_problems('no if0, has folds', problems, 
-        lambda p: not ('if0' in p.operators) and ('fold' in p.operators or 'tfold' in p.operators))
-    print_count_of_problems('no if0 or folds', problems, 
-        lambda p: not ('if0' in p.operators or 'fold' in p.operators or 'tfold' in p.operators))
-    print_count_of_problems('has if0', problems, 
-        lambda p: 'if0' in p.operators)
-    print_count_of_problems('bonus', problems, 
-        lambda p: 'bonus' in p.operators)
-     
+    print 
+    print '---------- Solved -------------'
+    print_categories([p for p in problems if p.solved])
+    print
+    print '---------- Remaining ----------'
+    print_categories([p for p in problems if not p.solved])
+    print
+    
+
+def main():
+    logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
+#    update_myproblems_file()
+    print_problem_statistics()
 
 if __name__ == '__main__':
-    print_problem_statistics()
+    main()
+    
+    

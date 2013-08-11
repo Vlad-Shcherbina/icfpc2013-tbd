@@ -1,3 +1,5 @@
 auth_token.txt
+myproblems.json
+cached_problem_ids.pickle
 unique_preds.pickle
 unique_terms.pickle

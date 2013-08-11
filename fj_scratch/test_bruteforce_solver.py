@@ -10,9 +10,9 @@ logging.getLogger('communicate').setLevel(logging.WARNING)
 import solver_driver
 import brute_force_solver
 import local_server 
-from communicate import get_training_problem_iter
+from communicate import get_training_problem_iter, get_training_problem
 
 
-server = local_server.Server(get_training_problem_iter(size=10), True)
+server = local_server.Server([get_training_problem(size=10)], True)
 solver = brute_force_solver.Solver()
 solver_driver.train(server, solver)
