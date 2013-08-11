@@ -15,7 +15,7 @@ import brute_force_solver
 import shape_solver
 
 
-def train(solver):
+def train(server, solver):
     logger.info('================= training  ==================')
     while True:
         logger.info('----------- trying another problem ------------')
@@ -25,16 +25,14 @@ def train(solver):
         logger.info(str(p))
 
         if solver.is_applicable(p):
-            solver.solve(p)
+            solver.solve(server, p)
             stats.add_value('solved', 0)
             stats.log_stats()
         else:
             logger.info('dunno how to solve')
 
-        #time.sleep(10)
 
-
-def actually_fucking_solve(solver):
+def actually_fucking_solve(server, solver):
     problems = get_real_problems()
     problems = [
         p for p in problems if p.solved is None and solver.is_applicable(p)]
@@ -80,7 +78,7 @@ def actually_fucking_solve(solver):
 
         logger.info('solving {}'.format(problem))
         logger.info('using {}'.format(solver))
-        solution = solver.solve(problem)
+        solution = solver.solve(server, problem)
 
         add_solved_problem(problem.id, False, problem.size, problem.operators, solution)
 

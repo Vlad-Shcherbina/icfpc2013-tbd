@@ -33,7 +33,7 @@ def random_interesting_number():
 class Solver(object):
     @classmethod
     def supported_sizes(cls):
-        return range(13, 13+1)
+        return range(9, 10)
 
     @classmethod
     def is_applicable(cls, problem):
@@ -46,7 +46,7 @@ class Solver(object):
         return True
 
     @classmethod
-    def solve(cls, problem):
+    def solve(cls, server, problem):
         assert cls.is_applicable(problem)
 
         def filter_candidates(candidates):
@@ -82,10 +82,10 @@ class Solver(object):
             *(enumerate_terms(size, problem.operators) for size in range(1, problem.size)))
         candidates = filter_candidates(candidates)
 
-        return basic_solver_loop(problem, candidates, logger)
+        return basic_solver_loop(server, problem, candidates, logger)
 
 
-def basic_solver_loop(problem, candidates, logger):
+def basic_solver_loop(server, problem, candidates, logger):
     attempts = 0
     start = time.time()
     while True:
@@ -102,7 +102,7 @@ def basic_solver_loop(problem, candidates, logger):
                     xs.append(x)
                     break
 
-        problem.request_eval(xs)
+        server.request_eval(problem, xs)
         logger.info('{} data points'.format(len(problem.values)))
 
         candidate = next(candidates, None)
@@ -112,7 +112,7 @@ def basic_solver_loop(problem, candidates, logger):
         program = (LAMBDA, ('x',), candidate)
 
         attempts += 1
-        if problem.guess(term_to_str(program)):
+        if server.guess(problem, term_to_str(program)):
             logger.info('solved!')
             stats.add_value(problem.kind()+'_time', time.time()-start)
             stats.add_value(problem.kind()+'_attempts', attempts)
