@@ -153,7 +153,8 @@ class UniqueDB(object):
         c = Constraint(exact_size, ops)
         smaller_c = Constraint(exact_size-1, ops)
         for fn in self.iter_functions():
-            if fn.is_possible_in(c) and not fn.is_possible_in(smaller_c):
+            # commented part makes this stuff incomplete for some reason...
+            if fn.is_possible_in(c): # and not fn.is_possible_in(smaller_c):
                 yield fn.minimal_implementation
 
     def get_where_term_is_possible_in(self, term):
