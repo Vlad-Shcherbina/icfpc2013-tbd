@@ -60,11 +60,7 @@ def actually_fucking_solve(server, solver):
     print '************'
     print 'DO NOT TERMINATE EXCEPT ON THE "waiting" MESSAGE!!!'
 
-    while True:
-        problem = server.get_problem()
-        if problem is None:
-            logger.info('No more problems to solve') 
-            break
+    for problem in problems:
         logger.info('----------- trying problem {} ------------'.format(problem))
 
         logger.info('solving {}'.format(problem))
