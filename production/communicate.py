@@ -54,7 +54,7 @@ def eval_program(program, xs):
 
 
 def get_training_problem(size=None, operators=None):
-    assert size is None or 3 <= size <= 30 or size == 42
+    assert size is None or 3 <= size <= 30 or size in (42, 137)
     assert operators in [None, [], ['tfold'], ['fold']]
 
     data = {}

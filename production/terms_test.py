@@ -51,4 +51,12 @@ def test_parse_term():
             ]
     for t in tests:
         eq_(term_to_str(parse_term(t)), t)
+
+    # test normalization
+    t = '(lambda (x_77708) (fold (and (shr4 (not (shr16 (shr16 (shr1 (shr4 (plus (if0 (shr1 (plus (xor (xor 0 (not x_77708)) 1) x_77708)) x_77708 1) 1))))))) x_77708) x_77708 (lambda (x_77709 x_77710) (if0 x_77709 x_77710 x_77709))))'
+    manually_normalized = t.replace('x_77708', 'x').replace('x_77709', 'y').replace('x_77710', 'z')
+    normalized = '(lambda (x) ' + term_to_str(parse_term(t, True)) + ')' 
+    eq_(normalized, manually_normalized)
+    
+    
     

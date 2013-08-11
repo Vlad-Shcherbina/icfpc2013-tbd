@@ -169,7 +169,10 @@ def tokenize(s):
     return res
 
 
-def parse_term(s):
+def parse_term(s, normalize=False):
+    '''Specify normalize=True to output parse tree in the internal representation:
+    no outermost lambda, input variable is assumbed to be called 'x'.
+    Also rename FOLD variables to 'y' and 'z' for a good measure.'''
     tokens = tokenize(s)
     context = {}
 
@@ -216,7 +219,7 @@ def parse_term(s):
                 return int(token)
             else:
                 check_id_use(token, pos)
-                return token
+                return context[token] if normalize else token
 
 
     def parse_lambda(argcount, tokens):
@@ -230,9 +233,10 @@ def parse_term(s):
         for i in xrange(argcount):
             id, pos = tokens.pop()
             check_id_declaration(id, pos)
-            ids.append(id)
+            normalized_id = 'x' if argcount == 1 else 'yz'[i] 
+            ids.append(normalized_id if normalize else id)
             old_bindings.append((id, context.get(id, undefined)))
-            context[id] = 'input' if argcount == 1 else 'fold_arg' + str(i)
+            context[id] = normalized_id
         expect(')')
         e = parse_expression(tokens)
         expect(')')
@@ -245,10 +249,18 @@ def parse_term(s):
         return (LAMBDA, tuple(ids), e)
 
     # execution
-    parsing_result = parse_lambda(1, tokens)
-    assert not len(tokens), 'Trailing identifiers: %s' % ' '.join(
-        '%r' % tok for tok, _ in reversed(tokens))
-    return parsing_result
+    def main():
+        result = parse_lambda(1, tokens)
+        assert not len(tokens), 'Trailing identifiers: %s' % ' '.join(
+            '%r' % tok for tok, _ in reversed(tokens))
+        if normalize:
+            # strip top-level lambda
+            tag, _, body = result
+            assert tag == LAMBDA
+            result = body
+        return result
+     
+    return main()
 
 
 def parse_any_term(s):

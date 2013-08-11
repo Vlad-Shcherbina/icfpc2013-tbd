@@ -4,6 +4,7 @@ from collections import namedtuple, Counter
 import pickle, json, os, re
 from os import path as os_path
 from communicate import Problem, send, get_training_problem
+from terms import parse_term
 
 
 
@@ -25,7 +26,7 @@ def load_cached(fname, f):
 
 if __name__ == '__main__':
     log.info('Yo!')
-    p = get_training_problem(42)
+    p = get_training_problem(137)
 #    pprint(p.solution)
-#    pprint(parse_term(p.solution))
+    pprint(parse_term(p.solution))
     log.info('done')
