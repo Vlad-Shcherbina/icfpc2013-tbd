@@ -1,10 +1,7 @@
 from z3 import *
-describe_tactics()
 
-f = Function('f', IntSort(), IntSort(), IntSort())
-x, y = Ints('x y')
-print ForAll([x, y], f(x, y) == 0)
-print Exists(x, f(x, x) >= 0)
+a, b = Bools('a b')
+prove(Not(Xor(a, b)) == Xor(a, Not(b)))
 
-a, b = Ints('a b')
-solve(ForAll(x, f(x, x) == 0), f(a, b) == 1)
+a, b = BitVec('a', 64), BitVec('b', 64)
+prove(~(a ^ b) == (a ^ ~b))

@@ -3,30 +3,29 @@ from pprint import pprint
 from collections import namedtuple, Counter
 import pickle, json, os, re
 from os import path as os_path
-from communicate import Problem, send, get_training_problem
+from communicate import send, get_training_problem
 from terms import parse_term
+from problem import Problem
+import local_server
 
+# adjust log levels
+import logging
+logging.getLogger('unique_db').setLevel(logging.WARNING)
+logging.getLogger('stats').setLevel(logging.WARNING)
 
-
-def update_problem_dump():
-    with open('../data/myproblems.json', 'wb') as f:
-        json.dump(send('myproblems'), f, indent=4)
-
-
-def load_cached(fname, f):
-    if os_path.exists(fname):
-        with open(fname, 'rb') as f:
-            return pickle.load(f)
-    else:
-        data = f()
-        with open(fname, 'wb') as f:
-            pickle.dump(data, f)
-        return data
+log.info('Yo!')
         
+ 
 
-if __name__ == '__main__':
-    log.info('Yo!')
-    p = get_training_problem(137)
-#    pprint(p.solution)
-    pprint(parse_term(p.solution))
-    log.info('done')
+import solver_driver
+import brute_force_solver
+from communicate import get_training_problem_iter
+
+
+p = Problem('123', 10, ['not', 'xor', 'shr4', 'tfold'])
+p.solution = '(lambda (x_6821) (fold x_6821 0 (lambda (x_6821 x_6822) (shr4 (xor (not x_6822) x_6821)))))' 
+server = local_server.Server([p])
+solver = brute_force_solver.Solver()
+solver_driver.train(server, solver)
+
+log.info('done')
