@@ -16,6 +16,9 @@ class Server(object):
     def get_problem(self):
         return next(self.problem_iter)
     
+    def get_all_problems(self):
+        return list(self.problem_iter)
+    
     def request_eval(self, problem, xs):
         self.check_if_we_are_for_real(problem)
         

@@ -30,7 +30,7 @@ def train(server, solver):
 
 
 def actually_fucking_solve(server, solver):
-    problems = server.get_problems()
+    problems = server.get_all_problems()
 
     # To ensure that in case of failure we return to the same problem.
     problems.sort(key=lambda p: (p.kind(), len(p.operators), p.id))
