@@ -116,7 +116,6 @@ def subst(t, replacements={}, leaf_replacer=None):
     return t
 
 
-from z3_utils import Control
 def term_size(t):
     if isinstance(t, tuple):
         if t[0] == LAMBDA:
@@ -125,6 +124,7 @@ def term_size(t):
         else:
             # fold is covered by this case
             return sum(map(term_size, t))
+    from z3_utils import Control
     if isinstance(t, Control):
         return term_size(t.operations[0])
     return 1
@@ -246,6 +246,73 @@ def parse_term(s):
 
     # execution
     parsing_result = parse_lambda(1, tokens)
+    assert not len(tokens), 'Trailing identifiers: %s' % ' '.join(
+        '%r' % tok for tok, _ in reversed(tokens))
+    return parsing_result
+
+
+def parse_any_term(s):
+    # no renaming
+
+    tokens = tokenize(s)
+
+    def expect(expected):
+        token, pos = tokens.pop()
+        assert expected == token, 'Invalid token at %d: %r, expected %r' % (pos, token, expected)\
+
+    def check_id_declaration(token, pos):
+        assert identifier_rx.match(token), 'Expected identifier at %d, got %r' % (pos, token)
+
+    def parse_expression():
+        token, pos = tokens.pop()
+        if token == '(':
+            result = None
+            token, pos = tokens.pop()
+            if token in UNARY_OPS:
+                arg1 = parse_expression()
+                result = (token, arg1)
+            elif token in BINARY_OPS:
+                arg1 = parse_expression()
+                arg2 = parse_expression()
+                result = (token, arg1, arg2)
+            elif token == IF0:
+                cond = parse_expression()
+                arg1 = parse_expression()
+                arg2 = parse_expression()
+                result = (token, cond, arg1, arg2)
+            elif token == FOLD:
+                e_in = parse_expression()
+                e_acc = parse_expression()
+                fn = parse_lambda()
+                result = (token, e_in, e_acc, fn)
+            else:
+                assert False, 'Expected operation at %d, got %r' % (pos, token)
+            expect(')')
+            return result
+        else:
+            if token in '01':
+                return int(token)
+            else:
+                return token
+
+    def parse_lambda():
+        expect('(')
+        expect('lambda')
+        expect('(')
+
+        args = []
+        token, pos = tokens.pop()
+        while token != ')':
+            check_id_declaration(token, pos)
+            args.append(token)
+            token, pos = tokens.pop()
+
+        body = parse_expression()
+        expect(')')
+
+        return (LAMBDA, tuple(args), body)
+
+    parsing_result = parse_expression()
     assert not len(tokens), 'Trailing identifiers: %s' % ' '.join(
         '%r' % tok for tok, _ in reversed(tokens))
     return parsing_result
