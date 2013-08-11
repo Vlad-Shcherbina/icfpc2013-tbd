@@ -18,24 +18,19 @@ import shape_solver
 def train(server, solver):
     logger.info('================= training  ==================')
     while True:
-        logger.info('----------- trying another problem ------------')
-        size = random.choice(solver.supported_sizes())
-        p = get_training_problem(size=size)# , operators=['tfold'])
+        problem = server.get_problem()
+        if problem is None:
+            logger.info('No more problems to solve') 
+            break
+        logger.info('----------- trying problem {} ------------'.format(problem))
 
-        logger.info(str(p))
-
-        if solver.is_applicable(p):
-            solver.solve(server, p)
-            stats.add_value('solved', 0)
-            stats.log_stats()
-        else:
-            logger.info('dunno how to solve')
+        solver.solve(server, problem)
+        stats.add_value('solved', 0)
+        stats.log_stats()
 
 
 def actually_fucking_solve(server, solver):
-    problems = get_real_problems()
-    problems = [
-        p for p in problems if p.solved is None and solver.is_applicable(p)]
+    problems = server.get_problems()
 
     # To ensure that in case of failure we return to the same problem.
     problems.sort(key=lambda p: (p.kind(), len(p.operators), p.id))
@@ -65,16 +60,12 @@ def actually_fucking_solve(server, solver):
     print '************'
     print 'DO NOT TERMINATE EXCEPT ON THE "waiting" MESSAGE!!!'
 
-    for problem in problems:
-        print 'waiting 10s...'
-        time.sleep(10)  # sleep to clear any resource window for sure
-
-        #print 'do you think it\'s a good idea to try to solve'
-        #print problem
-        #print 'with {}?'.format(solver)
-        #answer = raw_input()
-        #if answer != 'yes':
-        #    exit()
+    while True:
+        problem = server.get_problem()
+        if problem is None:
+            logger.info('No more problems to solve') 
+            break
+        logger.info('----------- trying problem {} ------------'.format(problem))
 
         logger.info('solving {}'.format(problem))
         logger.info('using {}'.format(solver))

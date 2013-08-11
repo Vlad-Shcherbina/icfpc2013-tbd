@@ -4,13 +4,18 @@ logger = logging.getLogger('real_server')
 import communicate, statistics
 
 class Server(object):
-    def __init__(self, training=True):
+    def __init__(self, problems, training=True):
+        self.problem_iter = iter(problems)
         self.training = training
         
     def check_if_we_are_for_real(self, problem):
         if self.training:
             assert not statistics.is_actual_problem(problem.id), 'we are not ready for real world yet'
-        
+    ######
+    
+    def get_problem(self):
+        return next(self.problem_iter)
+    
     def request_eval(self, problem, xs):
         self.check_if_we_are_for_real(problem)
         
@@ -41,4 +46,4 @@ class Server(object):
 
         assert False, r
 
-
+    

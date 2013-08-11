@@ -7,7 +7,6 @@ from random import randrange
 import itertools
 
 from terms import *
-from communicate import Problem, get_training_problem
 from enum_terms import enumerate_terms
 import stats
 import attach
@@ -31,24 +30,7 @@ def random_interesting_number():
 
 
 class Solver(object):
-    @classmethod
-    def supported_sizes(cls):
-        return range(9, 10)
-
-    @classmethod
-    def is_applicable(cls, problem):
-        if problem.size not in cls.supported_sizes():
-            return False
-        if 'fold' in problem.operators:
-            return False
-        if 'tfold' in problem.operators:
-            return False
-        return True
-
-    @classmethod
-    def solve(cls, server, problem):
-        assert cls.is_applicable(problem)
-
+    def solve(self, server, problem):
         def filter_candidates(candidates):
             num_tries = 0
             for candidate in candidates:

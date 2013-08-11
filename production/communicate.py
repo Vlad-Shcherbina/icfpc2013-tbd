@@ -71,11 +71,28 @@ def get_training_problem(size=None, operators=None):
     add_solved_problem(p.id, True, p.size, p.operators, p.solution)
     return p
 
+def get_training_problem_iter(size=None, operators=None):
+    while True:
+        yield get_training_problem(size, operators)
+
 def get_real_problems():
     r = send('myproblems')
     return map(Problem.from_json, r)
 
 
+def get_real_fucking_problems_to_solve(sizes, operator_predicate):
+    problems = get_real_problems()
+    if isinstance(sizes, int):
+        sizes = (sizes,)
+    problems = [
+            p for p in problems
+            if not p.solved
+            and p.size in sizes 
+            and operator_predicate is None or operator_predicate(p)]
+    return problems  
+    
+    
+    
 if __name__ == '__main__':
     #logging.basicConfig(level=logging.DEBUG)
 
