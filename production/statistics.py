@@ -91,14 +91,16 @@ def print_problem_statistics():
         print_count_of_problems_p('if0 !fold !tfold !bonus', problems)
         print_count_of_problems_p('!if0 !fold !tfold !bonus', problems)
         print_count_of_problems_p('bonus', problems)
-        
+    
+    solved = [p for p in problems if p.solved]
+    remaining = [p for p in problems if not p.solved]
     print 'Total =', len(problems)
     print 
-    print '---------- Solved -------------'
-    print_categories([p for p in problems if p.solved])
+    print '---------- Solved:', len(solved)
+    print_categories(solved)
     print
-    print '---------- Remaining ----------'
-    print_categories([p for p in problems if not p.solved])
+    print '---------- Remaining:', len(remaining)
+    print_categories(remaining)
     print
     
 
