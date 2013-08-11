@@ -177,7 +177,7 @@ def enum_predicates(size, required_ops, allowed_ops, shapes=False):
     # TODO: fix code duplicatoin
     if shapes:
         assert len(required_ops) == 0
-    if shapes and size > 4 or size > 7:
+    if shapes and size > 4 or size > 6:
         return base_enum(size, required_ops, allowed_ops, shapes=shapes)
     distinct = generate_distinct_predicates(
         size, frozenset(required_ops), frozenset(allowed_ops))
