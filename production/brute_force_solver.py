@@ -61,11 +61,11 @@ class Solver(object):
                         problem.kind()+'_tries_to_find_candidate', num_tries)
                     yield candidate
 
-        ops = problem.operators & unique_db.DB_OPS
-        if 'fold' in problem.operators or 'tfold' in problem.operators:
-            ops |= frozenset('yz')
-            warmup_unique_db(min(3, problem.size-1), ops | frozenset('yz'))
-        warmup_unique_db(min(4, problem.size-1), ops)
+        # ops = problem.operators & unique_db.DB_OPS
+        # if 'fold' in problem.operators or 'tfold' in problem.operators:
+        #     ops |= frozenset('yz')
+        #     warmup_unique_db(min(3, problem.size-1), ops | frozenset('yz'))
+        # warmup_unique_db(min(4, problem.size-1), ops)
 
         candidates = itertools.chain(
             *(top_level_enum(size, problem.operators) for size in range(1, problem.size)))

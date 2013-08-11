@@ -93,15 +93,23 @@ def setup_dual_logging():
 
 if __name__ == '__main__':
     import real_server
-    from communicate import get_training_problem_iter
+    from communicate import get_training_problem_iter, get_real_problems_to_solve
 
     setup_dual_logging()
 
     solver = brute_force_solver.Solver()
     #solver = shape_solver.Solver()
 
-    server = real_server.Server(get_training_problem_iter(size=12))
+    server = real_server.Server(get_training_problem_iter(size=42))
     train(server, solver)
 
-    #actually_fucking_solve(server, solver)
+    exit()
+    def filter(p):
+        if 'tfold' in p.operators:
+            return True
+        if 'fold' in p.operators:
+            return False
+        return True
+    server= real_server.Server(get_real_problems_to_solve(13, filter), training=False)
+    actually_fucking_solve(server, solver)
 

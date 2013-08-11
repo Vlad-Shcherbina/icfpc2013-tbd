@@ -133,6 +133,8 @@ def enum_preds(size, allowed_ops, fold=False):
 def top_level_enum(size, operators):
     ops = frozenset(UNARY_OPS+BINARY_OPS+[IF0]) & frozenset(operators)
 
+    if 'bonus' in operators:
+        return enum_if0(size, ops, fold=('fold' in operators))
     if 'tfold' in operators:
         return enum_fold(size, ops, top_level=True)
 
@@ -180,4 +182,5 @@ if __name__ == '__main__':
     import logging
     logging.basicConfig(level=logging.INFO)
 
-    warmup_unique_db(5, unique_db.DB_OPS)
+    warmup_unique_db(7, unique_db.DB_OPS - frozenset([XOR, PLUS, 'y', 'z']))
+    #warmup_unique_db(5, unique_db.DB_OPS)
