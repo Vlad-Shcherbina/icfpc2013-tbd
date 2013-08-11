@@ -5,6 +5,8 @@ import pickle, json, os, re
 from os import path as os_path
 from communicate import Problem, send, get_training_problem
 
+
+
 def update_problem_dump():
     with open('../data/myproblems.json', 'wb') as f:
         json.dump(send('myproblems'), f, indent=4)
@@ -21,24 +23,9 @@ def load_cached(fname, f):
         return data
         
 
-def main():
-    
-    problems = load_cached('temp_problems.pickle', lambda: send('myproblems'))
-    print len(problems)
-#    p = get_training_problem(5, [])
-#    p.solution = '(lambda (x_5126) (shr1 (plus 1 (shr1 x_5126))))'
-#    print p
-#    p.request_eval([1, 13, 2**64-1])
-#    print p.values    
-        
-from terms import parse_term
-
-
-    
-
 if __name__ == '__main__':
     log.info('Yo!')
-#    p = get_training_problem(42)
+    p = get_training_problem(42)
 #    pprint(p.solution)
 #    pprint(parse_term(p.solution))
     log.info('done')
