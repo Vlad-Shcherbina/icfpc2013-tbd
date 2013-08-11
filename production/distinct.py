@@ -22,7 +22,7 @@ def term_signature(t):
             vars['z'] = pt >> 5
         result *= 7
         result += evaluate(t, vars)
-    return asf
+    return result
 
 def predicate_signature(t):
     result = 0
